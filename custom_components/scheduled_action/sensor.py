@@ -8,30 +8,67 @@ from .entity_base import ScheduledActionEntity
 from .text_utils import format_action_key, format_trigger_type, normalize_trigger_label
 
 
-def _trigger_display_text(item) -> str:
+_TRANSLATIONS = {
+    "en": {
+        "empty": "Empty",
+        "queued_one": "1 queued",
+        "queued_many": "{count} queued",
+        "when_home": "when home",
+        "when_away": "when away",
+        "when_asleep": "when asleep",
+        "when_awake": "when awake",
+        "on_label": "on {label}",
+        "at_time": "{action} at {time}",
+    },
+    "nl": {
+        "empty": "Leeg",
+        "queued_one": "1 ingepland",
+        "queued_many": "{count} ingepland",
+        "when_home": "wanneer thuis",
+        "when_away": "wanneer weg",
+        "when_asleep": "wanneer slapend",
+        "when_awake": "wanneer wakker",
+        "on_label": "bij {label}",
+        "at_time": "{action} om {time}",
+    },
+}
+
+
+def _language(coordinator) -> str:
+    language = str(getattr(coordinator.hass.config, "language", "en") or "en").lower()
+    return "nl" if language.startswith("nl") else "en"
+
+
+def _text(coordinator, key: str, **values) -> str:
+    language = _language(coordinator)
+    template = _TRANSLATIONS.get(language, _TRANSLATIONS["en"])[key]
+    return template.format(**values)
+
+
+def _trigger_display_text(coordinator, item) -> str:
     trigger = item.trigger_type
     trigger_data = item.trigger_data or {}
     trigger_label = normalize_trigger_label(getattr(item, "trigger_label", None))
 
     if trigger == TRIGGER_HOME:
-        return "when home"
+        return _text(coordinator, "when_home")
     if trigger == TRIGGER_AWAY:
-        return "when away"
+        return _text(coordinator, "when_away")
     if trigger == TRIGGER_ASLEEP:
-        return "when asleep"
+        return _text(coordinator, "when_asleep")
     if trigger == TRIGGER_AWAKE:
-        return "when awake"
+        return _text(coordinator, "when_awake")
     if trigger == TRIGGER_EVENT:
         if trigger_label:
-            return f"on {trigger_label}"
+            return _text(coordinator, "on_label", label=trigger_label)
         event_name = trigger_data.get("event_name")
         if event_name:
-            return f"on {normalize_trigger_label(event_name)}"
+            return _text(coordinator, "on_label", label=normalize_trigger_label(event_name))
     trigger_text = str(trigger).strip().replace("_", " ").lower()
     return trigger_text
 
 
-def _describe_queue_item(item) -> str:
+def _describe_queue_item(coordinator, item) -> str:
     if item.label:
         return str(item.label).strip()
 
@@ -41,9 +78,9 @@ def _describe_queue_item(item) -> str:
         parsed = dt_util.parse_datetime(item.due_at)
         if parsed is not None:
             local_dt = dt_util.as_local(parsed)
-            return f"{action_label} at {local_dt.strftime('%H:%M')}"
+            return _text(coordinator, "at_time", action=action_label, time=local_dt.strftime('%H:%M'))
 
-    return f"{action_label} {_trigger_display_text(item)}"
+    return f"{action_label} {_trigger_display_text(coordinator, item)}"
 
 
 def _queue_item_display_dict(item) -> dict:
@@ -103,18 +140,18 @@ class ScheduledActionQueueSensor(ScheduledActionEntity, SensorEntity):
     def native_value(self) -> str:
         count = self.coordinator.queue_count
         if count == 0:
-            return "Empty"
+            return _text(self.coordinator, "empty")
         if count == 1:
-            return "1 queued"
-        return f"{count} queued"
+            return _text(self.coordinator, "queued_one")
+        return _text(self.coordinator, "queued_many", count=count)
 
     @property
     def extra_state_attributes(self):
         items = list(self.coordinator.store.items)
         return {
             "entry_id": self.coordinator.config_entry.entry_id,
-            "queue_lines": [_describe_queue_item(item) for item in items],
-            "queue_text": "\n".join(_describe_queue_item(item) for item in items),
+            "queue_lines": [_describe_queue_item(self.coordinator, item) for item in items],
+            "queue_text": "\n".join(_describe_queue_item(self.coordinator, item) for item in items),
             "queue_items": [_queue_item_display_dict(item) for item in items],
         }
 
@@ -129,8 +166,8 @@ class ScheduledActionNextActionSensor(ScheduledActionEntity, SensorEntity):
     def native_value(self) -> str:
         item = self.coordinator.next_item
         if item is None:
-            return "Empty"
-        return _describe_queue_item(item)
+            return _text(self.coordinator, "empty")
+        return _describe_queue_item(self.coordinator, item)
 
     @property
     def extra_state_attributes(self):

@@ -47,20 +47,73 @@ _DELAY_ICON_WORDS = {
     12: "twelve",
 }
 
+_TRANSLATIONS = {
+    "en": {
+        "in_minutes": "In {minutes} mins",
+        "in_hours_one": "In {hours} hour",
+        "in_hours_many": "In {hours} hours",
+        "when_home": "When home",
+        "when_away": "When away",
+        "when_asleep": "When asleep",
+        "when_awake": "When awake",
+        "select_action": "Select action",
+        "selected_action": "Selected action",
+        "select_trigger": "Select trigger",
+        "on_home": "On home",
+        "on_away": "On away",
+        "on_asleep": "On asleep",
+        "on_awake": "On awake",
+        "current_queue": "Current queue",
+        "empty": "Empty",
+        "scheduled_action": "Scheduled action",
+    },
+    "nl": {
+        "in_minutes": "Over {minutes} min",
+        "in_hours_one": "Over {hours} uur",
+        "in_hours_many": "Over {hours} uur",
+        "when_home": "Wanneer thuis",
+        "when_away": "Wanneer weg",
+        "when_asleep": "Wanneer slapend",
+        "when_awake": "Wanneer wakker",
+        "select_action": "Actie kiezen",
+        "selected_action": "Gekozen actie",
+        "select_trigger": "Trigger kiezen",
+        "on_home": "Bij thuis",
+        "on_away": "Bij weg",
+        "on_asleep": "Bij slapend",
+        "on_awake": "Bij wakker",
+        "current_queue": "Huidige wachtrij",
+        "empty": "Leeg",
+        "scheduled_action": "Scheduled action",
+    },
+}
+
+
+def _language(hass: HomeAssistant) -> str:
+    language = str(getattr(hass.config, "language", "en") or "en").lower()
+    return "nl" if language.startswith("nl") else "en"
+
+
+def _text(hass: HomeAssistant, key: str, **values) -> str:
+    language = _language(hass)
+    template = _TRANSLATIONS.get(language, _TRANSLATIONS["en"])[key]
+    return template.format(**values)
+
 
 def _coordinator_for_entry(hass: HomeAssistant, entry_id: str):
     return hass.data.get(DOMAIN, {}).get(entry_id)
 
 
-def _format_time_preset_label(hours: float) -> str:
+def _format_time_preset_label(hass: HomeAssistant, hours: float) -> str:
     if hours < 1:
         minutes = int(round(hours * 60))
-        return f"In {minutes} mins"
+        return _text(hass, "in_minutes", minutes=minutes)
     if float(hours).is_integer():
         whole = int(hours)
-        unit = "hour" if whole == 1 else "hours"
-        return f"In {whole} {unit}"
-    return f"In {hours:g} hours"
+        if whole == 1:
+            return _text(hass, "in_hours_one", hours=whole)
+        return _text(hass, "in_hours_many", hours=whole)
+    return _text(hass, "in_hours_many", hours=f"{hours:g}")
 
 
 def _entry_slug(name: str) -> str:
@@ -112,12 +165,13 @@ def _queue_sensor_entity_id(hass: HomeAssistant, coordinator) -> str:
 
 def _popup_context_for_coordinator(coordinator) -> dict:
     scheduler = coordinator.scheduler
+    hass = coordinator.hass
 
     time_presets = [
         {
             "key": f"preset_{idx}",
             "hours": hours,
-            "label": _format_time_preset_label(hours),
+            "label": _format_time_preset_label(hass, hours),
             "trigger": {"type": TRIGGER_DELAY, "hours": hours},
         }
         for idx, hours in enumerate(scheduler.time_presets_hours, start=1)
@@ -128,15 +182,15 @@ def _popup_context_for_coordinator(coordinator) -> dict:
     if scheduler.home_state_entity:
         event_presets.extend(
             [
-                {"key": "home", "label": "When home", "trigger": {"type": TRIGGER_HOME}},
-                {"key": "away", "label": "When away", "trigger": {"type": TRIGGER_AWAY}},
+                {"key": "home", "label": _text(hass, "when_home"), "trigger": {"type": TRIGGER_HOME}},
+                {"key": "away", "label": _text(hass, "when_away"), "trigger": {"type": TRIGGER_AWAY}},
             ]
         )
     if scheduler.sleep_state_entity:
         event_presets.extend(
             [
-                {"key": "asleep", "label": "When asleep", "trigger": {"type": TRIGGER_ASLEEP}},
-                {"key": "awake", "label": "When awake", "trigger": {"type": TRIGGER_AWAKE}},
+                {"key": "asleep", "label": _text(hass, "when_asleep"), "trigger": {"type": TRIGGER_ASLEEP}},
+                {"key": "awake", "label": _text(hass, "when_awake"), "trigger": {"type": TRIGGER_AWAKE}},
             ]
         )
 
@@ -295,7 +349,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                 "text_only": True,
                 "content": (
                     "<ha-icon icon=\"mdi:select-place\"></ha-icon> "
-                    "<strong>Select action</strong>"
+                    f"<strong>{_text(hass, 'select_action')}</strong>"
                 ),
             },
             {
@@ -305,7 +359,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                 "entities": [
                     {
                         "entity": action_select_entity,
-                        "name": "Selected action",
+                        "name": _text(hass, "selected_action"),
                     }
                 ],
             },
@@ -314,7 +368,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                 "text_only": True,
                 "content": (
                     "<ha-icon icon=\"mdi:clock-start\"></ha-icon> "
-                    "<strong>Select trigger</strong>"
+                    f"<strong>{_text(hass, 'select_trigger')}</strong>"
                 ),
             },
         ]
@@ -337,7 +391,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "type": "button",
                         "show_name": True,
                         "show_icon": True,
-                        "name": "On home",
+                        "name": _text(hass, "on_home"),
                         "icon": "mdi:home-import-outline",
                         "icon_height": "32px",
                         "tap_action": {
@@ -348,7 +402,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                                 "entry_id": entry_id,
                                 "action_select_entity": action_select_entity,
                                 "trigger_type": "home",
-                                "trigger_label": "On home",
+                                "trigger_label": _text(hass, "on_home"),
                             },
                         },
                     },
@@ -356,7 +410,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "type": "button",
                         "show_name": True,
                         "show_icon": True,
-                        "name": "On away",
+                        "name": _text(hass, "on_away"),
                         "icon": "mdi:home-export-outline",
                         "icon_height": "32px",
                         "tap_action": {
@@ -367,7 +421,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                                 "entry_id": entry_id,
                                 "action_select_entity": action_select_entity,
                                 "trigger_type": "away",
-                                "trigger_label": "On away",
+                                "trigger_label": _text(hass, "on_away"),
                             },
                         },
                     },
@@ -381,7 +435,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "type": "button",
                         "show_name": True,
                         "show_icon": True,
-                        "name": "On asleep",
+                        "name": _text(hass, "on_asleep"),
                         "icon": "mdi:sleep",
                         "icon_height": "32px",
                         "tap_action": {
@@ -392,7 +446,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                                 "entry_id": entry_id,
                                 "action_select_entity": action_select_entity,
                                 "trigger_type": "asleep",
-                                "trigger_label": "On asleep",
+                                "trigger_label": _text(hass, "on_asleep"),
                             },
                         },
                     },
@@ -400,7 +454,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "type": "button",
                         "show_name": True,
                         "show_icon": True,
-                        "name": "On awake",
+                        "name": _text(hass, "on_awake"),
                         "icon": "mdi:sleep-off",
                         "icon_height": "32px",
                         "tap_action": {
@@ -411,7 +465,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                                 "entry_id": entry_id,
                                 "action_select_entity": action_select_entity,
                                 "trigger_type": "awake",
-                                "trigger_label": "On awake",
+                                "trigger_label": _text(hass, "on_awake"),
                             },
                         },
                     },
@@ -475,8 +529,8 @@ async def async_register_services(hass: HomeAssistant) -> None:
                     "type": "markdown",
                     "text_only": True,
                     "content": (
-                        f"<ha-alert title=\"Current queue\">"
-                        f"{{{{ (state_attr('{queue_entity_id}', 'queue_text') or 'Empty') | replace('\\n', '<br>') }}}}"
+                        f"<ha-alert title=\"{_text(hass, 'current_queue')}\">"
+                        f"{{{{ (state_attr('{queue_entity_id}', 'queue_text') or '{_text(hass, 'empty')}') | replace('\\n', '<br>') }}}}"
                         f"</ha-alert>"
                     ),
                 }
@@ -503,7 +557,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
         _LOGGER.debug(
             "open_popup: calling browser_mod.popup browser_id=%r title=%r card_count=%s",
             browser_id,
-            popup.get("scheduler_name") or "Scheduled action",
+            popup.get("scheduler_name") or _text(hass, "scheduled_action"),
             len(cards),
         )
         await hass.services.async_call(
@@ -511,7 +565,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
             "popup",
             {
                 "browser_id": browser_id,
-                "title": popup.get("device_name") or popup.get("scheduler_name") or "Scheduled action",
+                "title": popup.get("device_name") or popup.get("scheduler_name") or _text(hass, "scheduled_action"),
                 "dismissable": False,
                 "timeout": 120000,
                 "timeout_hide_progress": True,
