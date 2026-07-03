@@ -42,7 +42,6 @@ def _boolean_entity_selector():
                     {"domain": "binary_sensor"},
                     {"domain": "switch"},
                 ],
-                "allow_none": True,
             }
         }
     )
@@ -432,14 +431,28 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
         )
 
     async def async_step_edit_triggers(self, user_input=None):
+        choices = {
+            "standard_triggers": "Standard triggers",
+            "custom_triggers": "Custom triggers",
+        }
+
+        if user_input is None:
+            schema = vol.Schema({vol.Required("trigger_group"): vol.In(choices)})
+            return self.async_show_form(step_id="edit_triggers", data_schema=schema)
+
+        choice = str(user_input["trigger_group"])
+        if choice == "standard_triggers":
+            return await self.async_step_standard_triggers()
+        if choice == "custom_triggers":
+            return await self.async_step_custom_triggers()
+        return self.async_abort(reason="unknown_action")
+
+    async def async_step_standard_triggers(self, user_input=None):
         current = self._current()
-        current_events = list(current.get(CONF_CUSTOM_EVENTS, []))
-        defaults = current_events + [
-            {"label": "", "event_name": "", CONF_ICON: "mdi:alarm"}
-        ] * (2 - len(current_events))
         presets = list(current.get(CONF_TIME_PRESETS_HOURS, DEFAULT_TIME_PRESETS_HOURS))
         while len(presets) < 4:
             presets.append(None)
+
         if user_input is None:
             schema = vol.Schema(
                 {
@@ -467,31 +480,9 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                         CONF_SLEEP_STATE_ENTITY,
                         default=current.get(CONF_SLEEP_STATE_ENTITY) or None,
                     ): _boolean_entity_selector(),
-                    vol.Optional("custom_event_1_label", default=defaults[0]["label"]): str,
-                    vol.Optional("custom_event_1_name", default=defaults[0]["event_name"]): str,
-                    vol.Optional(
-                        "custom_event_1_icon",
-                        default=defaults[0].get(CONF_ICON) or "mdi:alarm",
-                    ): _icon_selector(),
-                    vol.Optional("custom_event_2_label", default=defaults[1]["label"]): str,
-                    vol.Optional("custom_event_2_name", default=defaults[1]["event_name"]): str,
-                    vol.Optional(
-                        "custom_event_2_icon",
-                        default=defaults[1].get(CONF_ICON) or "mdi:alarm",
-                    ): _icon_selector(),
                 }
             )
-            return self.async_show_form(step_id="edit_triggers", data_schema=schema)
-
-        custom_events = []
-        for idx in (1, 2):
-            label = str(user_input.get(f"custom_event_{idx}_label", "")).strip()
-            event_name = str(user_input.get(f"custom_event_{idx}_name", "")).strip()
-            icon = str(user_input.get(f"custom_event_{idx}_icon", "")).strip() or "mdi:alarm"
-            if label and event_name:
-                custom_events.append(
-                    {"label": label, "event_name": event_name, CONF_ICON: icon}
-                )
+            return self.async_show_form(step_id="standard_triggers", data_schema=schema)
 
         time_presets_hours = _parse_time_presets(
             user_input,
@@ -507,6 +498,50 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                     or None,
                     CONF_SLEEP_STATE_ENTITY: user_input.get(CONF_SLEEP_STATE_ENTITY)
                     or None,
+                }
+            ),
+        )
+
+    async def async_step_custom_triggers(self, user_input=None):
+        current = self._current()
+        current_events = list(current.get(CONF_CUSTOM_EVENTS, []))
+        defaults = current_events + [
+            {"label": "", "event_name": "", CONF_ICON: "mdi:alarm"}
+        ] * (2 - len(current_events))
+
+        if user_input is None:
+            schema = vol.Schema(
+                {
+                    vol.Optional("custom_event_1_label", default=defaults[0]["label"]): str,
+                    vol.Optional("custom_event_1_name", default=defaults[0]["event_name"]): str,
+                    vol.Optional(
+                        "custom_event_1_icon",
+                        default=defaults[0].get(CONF_ICON) or "mdi:alarm",
+                    ): _icon_selector(),
+                    vol.Optional("custom_event_2_label", default=defaults[1]["label"]): str,
+                    vol.Optional("custom_event_2_name", default=defaults[1]["event_name"]): str,
+                    vol.Optional(
+                        "custom_event_2_icon",
+                        default=defaults[1].get(CONF_ICON) or "mdi:alarm",
+                    ): _icon_selector(),
+                }
+            )
+            return self.async_show_form(step_id="custom_triggers", data_schema=schema)
+
+        custom_events = []
+        for idx in (1, 2):
+            label = str(user_input.get(f"custom_event_{idx}_label", "")).strip()
+            event_name = str(user_input.get(f"custom_event_{idx}_name", "")).strip()
+            icon = str(user_input.get(f"custom_event_{idx}_icon", "")).strip() or "mdi:alarm"
+            if label and event_name:
+                custom_events.append(
+                    {"label": label, "event_name": event_name, CONF_ICON: icon}
+                )
+
+        return self.async_create_entry(
+            title="",
+            data=self._options_with(
+                **{
                     CONF_CUSTOM_EVENTS: custom_events[:MAX_CUSTOM_EVENTS],
                 }
             ),
