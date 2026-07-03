@@ -1,0 +1,82 @@
+open_popup:
+  name: Open popup
+  description: Open the scheduler popup for one scheduled_action entry on a specific Browser Mod browser target.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+    browser_id:
+      required: true
+      selector:
+        text:
+schedule:
+  name: Schedule action
+  description: Schedule a new action for one scheduled_action entry.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+    action_id:
+      required: false
+      selector:
+        text:
+    target_entity_id:
+      required: false
+      selector:
+        entity: {}
+    action:
+      required: false
+      selector:
+        select:
+          options:
+            - turn_on
+            - turn_off
+            - toggle
+            - press
+    label:
+      required: false
+      selector:
+        text:
+    trigger:
+      required: true
+      selector:
+        object: {}
+cancel:
+  name: Cancel scheduled action
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+    item_id:
+      required: true
+      selector:
+        text:
+cancel_all:
+  name: Cancel all scheduled actions
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+fire_event:
+  name: Fire scheduled action event
+  fields:
+    event_name:
+      required: true
+      selector:
+        text:
+    entry_id:
+      required: false
+      selector:
+        text:
+get_popup_context:
+  name: Get popup context
+  description: Return dynamic popup metadata for one scheduled_action entry.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:

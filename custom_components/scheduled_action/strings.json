@@ -1,0 +1,111 @@
+{
+  "title": "Scheduled Action",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Create scheduler",
+        "description": "Create a Scheduled Action scheduler entry.",
+        "data": {
+          "name": "Name"
+        }
+      },
+      "details": {
+        "title": "Scheduler details",
+        "data": {
+          "preset_1": "Time preset 1 (hours)",
+          "preset_2": "Time preset 2 (hours)",
+          "preset_3": "Time preset 3 (hours)",
+          "preset_4": "Time preset 4 (hours)",
+          "home_state_entity": "Home state entity",
+          "sleep_state_entity": "Sleep state entity",
+          "custom_event_1_label": "Custom event 1 label",
+          "custom_event_1_name": "Custom event 1 name",
+          "custom_event_2_label": "Custom event 2 label",
+          "custom_event_2_name": "Custom event 2 name"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Scheduled Action",
+        "description": "Choose what you want to edit.",
+        "data": {
+          "action": "Action"
+        }
+      },
+      "manage_actions": {
+        "title": "Manage actions",
+        "description": "Add, edit, or delete predefined actions for this scheduler.",
+        "data": {
+          "manage_action": "Action management"
+        }
+      },
+      "select_action_to_edit": {
+        "title": "Select action to edit",
+        "data": {
+          "action_id": "Action"
+        }
+      },
+      "add_action": {
+        "title": "Add action",
+        "data": {
+          "label": "Label",
+          "target_entity_id": "Target entity",
+          "action_type": "Action type"
+        }
+      },
+      "edit_action": {
+        "title": "Edit action",
+        "data": {
+          "label": "Label",
+          "target_entity_id": "Target entity",
+          "action_type": "Action type"
+        }
+      },
+      "delete_action": {
+        "title": "Delete action",
+        "data": {
+          "action_id": "Action"
+        }
+      },
+      "edit_triggers": {
+        "title": "Edit triggers",
+        "data": {
+          "home_state_entity": "Home state entity",
+          "sleep_state_entity": "Sleep state entity",
+          "custom_event_1_label": "Custom event 1 label",
+          "custom_event_1_name": "Custom event 1 name",
+          "custom_event_2_label": "Custom event 2 label",
+          "custom_event_2_name": "Custom event 2 name"
+        }
+      },
+      "edit_time_presets": {
+        "title": "Edit time presets",
+        "data": {
+          "preset_1": "Time preset 1 (hours)",
+          "preset_2": "Time preset 2 (hours)",
+          "preset_3": "Time preset 3 (hours)",
+          "preset_4": "Time preset 4 (hours)"
+        }
+      }
+    },
+    "selector": {
+      "action": {
+        "options": {
+          "manage_actions": "Manage predefined actions",
+          "edit_triggers": "Edit trigger links and custom events",
+          "edit_time_presets": "Edit time presets"
+        }
+      },
+      "manage_action": {
+        "options": {
+          "add_action": "Add action",
+          "edit_action": "Edit action",
+          "delete_action": "Delete action"
+        }
+      }
+    }
+  }
+}
