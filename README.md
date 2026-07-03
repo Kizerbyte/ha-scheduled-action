@@ -37,8 +37,16 @@ You can spawn an integration entry that holds its own triggers and actions, so h
 - Infinitely many different configurations, referenced by 'entry_id'!
   - Hide unwanted triggers from the popup
 
+-->[CODE EXAMPLES](#code-examples)<--
+
 ![Popup preview](images/Airco-popup-preview-queue.png)
 
+### Notes
+
+- Browser Mod is optional, but recommended if you want the popup flow.
+- The popup flow is designed so the backend owns the popup context and scheduler logic.
+
+---
 
 ## Installation
 
@@ -72,29 +80,6 @@ config/
 ```
 
 ## Configuration
-### Popup call
-
-This integration can open a Browser Mod popup through the integration-owned service:
-
-- `scheduled_action.open_popup`
-
-Recommended Lovelace pattern:
-
-```yaml
-tap_action:
-  action: fire-dom-event
-  browser_mod:
-    service: scheduled_action.open_popup
-    data:
-      entry_id: YOUR_ENTRY_ID
-      browser_id: THIS
-```
-
-Why this pattern:
-- Browser Mod resolves `browser_id: THIS` correctly in the `fire-dom-event` path.
-- The integration handles popup content generation itself, so the dashboard YAML stays small.
-
-### Entry config
 
 This integration is configured through the Home Assistant UI.
 
@@ -123,7 +108,7 @@ A scheduler entry contains:
 When something is scheduled, it is added to the queue.
 The integration then exposes queue state through entities and executes the action when its trigger condition is met.
 
-## Example use cases
+### Example use cases
 
 - Turn something off in 30 minutes
 - Queue an IR button press for later
@@ -156,7 +141,31 @@ Main services exposed by the integration:
 See also:
 - `custom_components/scheduled_action/services.yaml`
 
-### Example: fire a custom event from an automation
+## Code examples
+
+### Popup call
+
+This integration can open a Browser Mod popup through the integration-owned service:
+
+- `scheduled_action.open_popup`
+
+Recommended Lovelace pattern:
+
+```yaml
+tap_action:
+  action: fire-dom-event
+  browser_mod:
+    service: scheduled_action.open_popup
+    data:
+      entry_id: <ENTRY_ID>
+      browser_id: THIS
+```
+
+Why this pattern:
+- Browser Mod resolves `browser_id: THIS` correctly in the `fire-dom-event` path.
+- The integration handles popup content generation itself, so the dashboard YAML stays small.
+
+### Fire a custom event from an automation
 
 Use the integration service instead of firing the internal event bus event directly.
 
@@ -172,7 +181,7 @@ triggers:
 actions:
   - action: scheduled_action.fire_event
     data:
-      entry_id: YOUR_ENTRY_ID
+      entry_id: <ENTRY_ID>
       event_name: 1h_before_alarm
 ```
 
@@ -181,39 +190,54 @@ Notes:
 - Include `entry_id` if you have more than one scheduler instance.
 - If no queued item is waiting for that `event_name`, nothing happens; this is a safe no-op.
 
-### Example: schedule an action
-
+### Schedule an action
+#### Time based
 ```yaml
 action: scheduled_action.schedule
 data:
-  entry_id: YOUR_ENTRY_ID
-  action_id: YOUR_ACTION_ID
+  entry_id: <ENTRY_ID>
+  target_entity_id: <ENTITY_ID>
+  action: <turn_off/turn_on/press/toggle>
   trigger:
     type: delay
     hours: 0.5
 ```
-
-### Example: cancel one queued item
+#### Event based
+```yaml
+action: scheduled_action.schedule
+    data:
+      entry_id: <ENTRY_ID>
+      target_entity_id: <ENTITY_ID>
+      action: <turn_off/turn_on/press/toggle>
+      trigger:
+        type: event
+        event_name: 1h_before_alarm
+```
+You can replace
+```yaml
+target_entity_id: <ENTITY_ID>
+action: <turn_off/turn_on/press/toggle>
+```
+with
+```yaml
+action_id: ACTION_ID
+```
+### Cancel one queued item
 
 ```yaml
 action: scheduled_action.cancel
 data:
-  entry_id: YOUR_ENTRY_ID
-  item_id: YOUR_ITEM_ID
+  entry_id: <ENTRY_ID>
+  item_id: <ITEM_ID>
 ```
 
-### Example: clear all queued items
+### Clear all queued items
 
 ```yaml
 action: scheduled_action.cancel_all
 data:
-  entry_id: YOUR_ENTRY_ID
+  entry_id: <ENTRY_ID>
 ```
-
-## Notes
-
-- Browser Mod is optional, but recommended if you want the popup flow.
-- The popup flow is designed so the backend owns the popup context and scheduler logic.
 
 ## License
 
