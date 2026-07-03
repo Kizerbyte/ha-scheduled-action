@@ -456,46 +456,66 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
         if user_input is None:
             home_default = current.get(CONF_HOME_STATE_ENTITY)
             sleep_default = current.get(CONF_SLEEP_STATE_ENTITY)
+            use_home_trigger = isinstance(home_default, str) and "." in home_default
+            use_sleep_trigger = isinstance(sleep_default, str) and "." in sleep_default
+            use_preset_1 = presets[0] is not None
+            use_preset_2 = presets[1] is not None
+            use_preset_3 = presets[2] is not None
+            use_preset_4 = presets[3] is not None
             schema = vol.Schema(
                 {
+                    vol.Optional("use_preset_1", default=use_preset_1): bool,
                     vol.Optional(
                         "preset_1",
                         default="" if presets[0] is None else str(presets[0]),
                     ): str,
+                    vol.Optional("use_preset_2", default=use_preset_2): bool,
                     vol.Optional(
                         "preset_2",
                         default="" if presets[1] is None else str(presets[1]),
                     ): str,
+                    vol.Optional("use_preset_3", default=use_preset_3): bool,
                     vol.Optional(
                         "preset_3",
                         default="" if presets[2] is None else str(presets[2]),
                     ): str,
+                    vol.Optional("use_preset_4", default=use_preset_4): bool,
                     vol.Optional(
                         "preset_4",
                         default="" if presets[3] is None else str(presets[3]),
                     ): str,
+                    vol.Optional("use_home_trigger", default=use_home_trigger): bool,
                     vol.Optional(
                         CONF_HOME_STATE_ENTITY,
-                        default=home_default if isinstance(home_default, str) and "." in home_default else None,
+                        default=home_default if use_home_trigger else None,
                     ): _boolean_entity_selector(),
+                    vol.Optional("use_sleep_trigger", default=use_sleep_trigger): bool,
                     vol.Optional(
                         CONF_SLEEP_STATE_ENTITY,
-                        default=sleep_default if isinstance(sleep_default, str) and "." in sleep_default else None,
+                        default=sleep_default if use_sleep_trigger else None,
                     ): _boolean_entity_selector(),
                 }
             )
             return self.async_show_form(step_id="standard_triggers", data_schema=schema)
 
-        time_presets_hours = _parse_time_presets(
-            user_input,
-            ["preset_1", "preset_2", "preset_3", "preset_4"],
-        )
+        preset_fields = ["preset_1", "preset_2", "preset_3", "preset_4"]
+        time_presets_hours = []
+        for idx, field_name in enumerate(preset_fields, start=1):
+            enabled = bool(user_input.get(f"use_preset_{idx}"))
+            value = _parse_optional_float(user_input.get(field_name))
+            time_presets_hours.append(value if enabled else None)
+
+        while time_presets_hours and time_presets_hours[-1] is None:
+            time_presets_hours.pop()
 
         home_state_entity = user_input.get(CONF_HOME_STATE_ENTITY)
         sleep_state_entity = user_input.get(CONF_SLEEP_STATE_ENTITY)
-        if not isinstance(home_state_entity, str) or "." not in home_state_entity:
+        use_home_trigger = bool(user_input.get("use_home_trigger"))
+        use_sleep_trigger = bool(user_input.get("use_sleep_trigger"))
+
+        if not use_home_trigger or not isinstance(home_state_entity, str) or "." not in home_state_entity:
             home_state_entity = None
-        if not isinstance(sleep_state_entity, str) or "." not in sleep_state_entity:
+        if not use_sleep_trigger or not isinstance(sleep_state_entity, str) or "." not in sleep_state_entity:
             sleep_state_entity = None
 
         return self.async_create_entry(
