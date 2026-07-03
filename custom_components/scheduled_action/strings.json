@@ -114,16 +114,38 @@
       },
       "edit_triggers": {
         "title": "Edit triggers",
+        "description": "Choose which trigger group you want to edit.",
         "data": {
+          "trigger_group": "Choose group"
+        }
+      },
+      "standard_triggers": {
+        "title": "Standard triggers",
+        "description": "Configure timed, home, and sleep triggers.",
+        "data": {
+          "use_timed_trigger_1": "Use timed trigger 1",
+          "use_timed_trigger_2": "Use timed trigger 2",
+          "use_timed_trigger_3": "Use timed trigger 3",
+          "use_timed_trigger_4": "Use timed trigger 4",
           "timed_trigger_1": "Timed trigger 1 (hours)",
           "timed_trigger_2": "Timed trigger 2 (hours)",
           "timed_trigger_3": "Timed trigger 3 (hours)",
           "timed_trigger_4": "Timed trigger 4 (hours)",
+          "use_home_trigger": "Use home trigger",
           "home_state_entity": "Home state entity",
-          "sleep_state_entity": "Sleep state entity",
+          "use_sleep_trigger": "Use sleep trigger",
+          "sleep_state_entity": "Sleep state entity"
+        }
+      },
+      "custom_triggers": {
+        "title": "Custom triggers",
+        "description": "Configure custom event triggers and icons.",
+        "data": {
+          "use_custom_trigger_1": "Use custom trigger 1",
           "custom_trigger_1_label": "Custom trigger 1 label",
           "custom_trigger_1_name": "Custom trigger 1 name",
           "custom_trigger_1_icon": "Custom trigger 1 icon",
+          "use_custom_trigger_2": "Use custom trigger 2",
           "custom_trigger_2_label": "Custom trigger 2 label",
           "custom_trigger_2_name": "Custom trigger 2 name",
           "custom_trigger_2_icon": "Custom trigger 2 icon"
@@ -147,6 +169,12 @@
           "edit_action": "Edit action",
           "edit_triggers": "Edit triggers",
           "remove_action": "Remove action"
+        }
+      },
+      "trigger_group": {
+        "options": {
+          "custom_triggers": "Custom triggers",
+          "standard_triggers": "Standard triggers"
         }
       },
       "manage_action": {

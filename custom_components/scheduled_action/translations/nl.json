@@ -114,16 +114,38 @@
       },
       "edit_triggers": {
         "title": "Triggers bewerken",
+        "description": "Kies welke triggergroep je wilt bewerken.",
         "data": {
+          "trigger_group": "Kies groep"
+        }
+      },
+      "standard_triggers": {
+        "title": "Standaardtriggers",
+        "description": "Configureer tijd-, thuis- en slaaptriggers.",
+        "data": {
+          "use_timed_trigger_1": "Gebruik tijdtrigger 1",
+          "use_timed_trigger_2": "Gebruik tijdtrigger 2",
+          "use_timed_trigger_3": "Gebruik tijdtrigger 3",
+          "use_timed_trigger_4": "Gebruik tijdtrigger 4",
           "timed_trigger_1": "Tijdtrigger 1 (uren)",
           "timed_trigger_2": "Tijdtrigger 2 (uren)",
           "timed_trigger_3": "Tijdtrigger 3 (uren)",
           "timed_trigger_4": "Tijdtrigger 4 (uren)",
+          "use_home_trigger": "Gebruik thuistrigger",
           "home_state_entity": "Home-status entiteit",
-          "sleep_state_entity": "Slaapstatus entiteit",
+          "use_sleep_trigger": "Gebruik slaaptrigger",
+          "sleep_state_entity": "Slaapstatus entiteit"
+        }
+      },
+      "custom_triggers": {
+        "title": "Custom triggers",
+        "description": "Configureer custom event-triggers en iconen.",
+        "data": {
+          "use_custom_trigger_1": "Gebruik custom trigger 1",
           "custom_trigger_1_label": "Label custom trigger 1",
           "custom_trigger_1_name": "Naam custom trigger 1",
           "custom_trigger_1_icon": "Icoon custom trigger 1",
+          "use_custom_trigger_2": "Gebruik custom trigger 2",
           "custom_trigger_2_label": "Label custom trigger 2",
           "custom_trigger_2_name": "Naam custom trigger 2",
           "custom_trigger_2_icon": "Icoon custom trigger 2"
@@ -147,6 +169,12 @@
           "edit_action": "Actie bewerken",
           "edit_triggers": "Triggers bewerken",
           "remove_action": "Actie verwijderen"
+        }
+      },
+      "trigger_group": {
+        "options": {
+          "custom_triggers": "Custom triggers",
+          "standard_triggers": "Standaardtriggers"
         }
       },
       "manage_action": {
