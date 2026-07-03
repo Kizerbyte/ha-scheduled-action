@@ -1,5 +1,9 @@
 # Scheduled Action
 
+<p align="center">
+  <img src="assets/icon.jpg" alt="Scheduled Action icon" width="180">
+</p>
+
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://hacs.xyz/)
 [![GitHub Release](https://img.shields.io/github/v/release/Kizerbyte/ha-scheduled-action?style=for-the-badge)](https://github.com/Kizerbyte/ha-scheduled-action/releases)
 
@@ -157,7 +161,7 @@ Supporting docs included in the repo:
 
 - `custom_components/scheduled_action/README_popup_bridge.md`
 - `custom_components/scheduled_action/EXAMPLE_popup_bridge.yaml`
-
+- `assets/ATTRIBUTION.md`\n
 ## License
 
 See `LICENSE`.

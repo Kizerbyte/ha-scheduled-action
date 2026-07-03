@@ -2,13 +2,15 @@
 
 If this repository includes third-party artwork, record the source, author, license, and required attribution here.
 
-## Planned icon source
+## Repository icon
 
-Requested source:
+File:
+- `assets/icon.jpg`
+
+Source:
 - https://www.flaticon.com/free-icon/gear_5528738
 
-Before committing the actual icon file, confirm:
-- exact downloadable file used
-- author name shown on Flaticon
-- exact license/attribution text required
-- whether attribution in-repo is sufficient for your intended use
+Notes:
+- User requested this Flaticon gear/clock icon for repository branding.
+- This asset is treated as a third-party icon requiring attribution.
+- If stricter attribution wording is needed later, replace this section with the exact wording from the source page/license.
