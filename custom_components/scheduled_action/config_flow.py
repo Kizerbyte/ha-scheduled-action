@@ -432,8 +432,8 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_edit_triggers(self, user_input=None):
         choices = {
-            "standard_triggers": "Standard triggers",
             "custom_triggers": "Custom triggers",
+            "standard_triggers": "Standard triggers",
         }
 
         if user_input is None:
@@ -454,6 +454,8 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
             presets.append(None)
 
         if user_input is None:
+            home_default = current.get(CONF_HOME_STATE_ENTITY)
+            sleep_default = current.get(CONF_SLEEP_STATE_ENTITY)
             schema = vol.Schema(
                 {
                     vol.Optional(
@@ -474,11 +476,11 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                     ): str,
                     vol.Optional(
                         CONF_HOME_STATE_ENTITY,
-                        default=current.get(CONF_HOME_STATE_ENTITY) or None,
+                        default=home_default if isinstance(home_default, str) and "." in home_default else None,
                     ): _boolean_entity_selector(),
                     vol.Optional(
                         CONF_SLEEP_STATE_ENTITY,
-                        default=current.get(CONF_SLEEP_STATE_ENTITY) or None,
+                        default=sleep_default if isinstance(sleep_default, str) and "." in sleep_default else None,
                     ): _boolean_entity_selector(),
                 }
             )
@@ -489,15 +491,20 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
             ["preset_1", "preset_2", "preset_3", "preset_4"],
         )
 
+        home_state_entity = user_input.get(CONF_HOME_STATE_ENTITY)
+        sleep_state_entity = user_input.get(CONF_SLEEP_STATE_ENTITY)
+        if not isinstance(home_state_entity, str) or "." not in home_state_entity:
+            home_state_entity = None
+        if not isinstance(sleep_state_entity, str) or "." not in sleep_state_entity:
+            sleep_state_entity = None
+
         return self.async_create_entry(
             title="",
             data=self._options_with(
                 **{
                     CONF_TIME_PRESETS_HOURS: time_presets_hours,
-                    CONF_HOME_STATE_ENTITY: user_input.get(CONF_HOME_STATE_ENTITY)
-                    or None,
-                    CONF_SLEEP_STATE_ENTITY: user_input.get(CONF_SLEEP_STATE_ENTITY)
-                    or None,
+                    CONF_HOME_STATE_ENTITY: home_state_entity,
+                    CONF_SLEEP_STATE_ENTITY: sleep_state_entity,
                 }
             ),
         )
