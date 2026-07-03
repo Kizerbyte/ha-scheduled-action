@@ -7,7 +7,7 @@
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://hacs.xyz/)
 [![GitHub Release](https://img.shields.io/github/v/release/Kizerbyte/ha-scheduled-action?style=for-the-badge)](https://github.com/Kizerbyte/ha-scheduled-action/releases)
 
-Home Assistant custom component to schedule actions for entities using delays, state-based triggers, and custom events.
+Home Assistant custom component to schedule predefined actions using delays, state-based triggers, and custom events.
 
 `Scheduled Action` is useful when you want a lightweight scheduler that can:
 - queue an action for later
@@ -33,14 +33,14 @@ Home Assistant custom component to schedule actions for entities using delays, s
 
 ### HACS (Custom Repository)
 
-1. Open **HACS**
-2. Go to **⋮ → Custom repositories**
+1. Open **HACS**.
+2. Go to **⋮ → Custom repositories**.
 3. Add repository:
    - **Repository**: `https://github.com/Kizerbyte/ha-scheduled-action`
    - **Category**: `Integration`
-4. Search for **Scheduled Action**
-5. Install
-6. Restart Home Assistant
+4. Search for **Scheduled Action**.
+5. Install it.
+6. Restart Home Assistant.
 
 ### Manual
 
@@ -80,7 +80,7 @@ After setup, the options flow lets you:
 ## How it works
 
 A scheduler entry contains:
-- one or more actions
+- one or more predefined actions
 - a set of preset delays
 - optional state triggers
 - optional custom event triggers
@@ -117,7 +117,10 @@ tap_action:
       browser_id: THIS
 ```
 
-This keeps dashboard YAML small while the integration builds the popup content itself.
+Why this pattern:
+- Browser Mod resolves `browser_id: THIS` correctly in the `fire-dom-event` path.
+- A plain Lovelace `perform-action` call is **not** the recommended public entry point for opening this popup.
+- The integration handles popup content generation itself, so the dashboard YAML stays small.
 
 More popup details and examples are included here:
 - `custom_components/scheduled_action/README_popup_bridge.md`
@@ -137,6 +140,35 @@ Main services exposed by the integration:
 See also:
 - `custom_components/scheduled_action/services.yaml`
 
+### Example: schedule an action
+
+```yaml
+action: scheduled_action.schedule
+data:
+  entry_id: YOUR_ENTRY_ID
+  action_id: YOUR_ACTION_ID
+  trigger:
+    type: delay
+    hours: 0.5
+```
+
+### Example: cancel one queued item
+
+```yaml
+action: scheduled_action.cancel
+data:
+  entry_id: YOUR_ENTRY_ID
+  item_id: YOUR_ITEM_ID
+```
+
+### Example: clear all queued items
+
+```yaml
+action: scheduled_action.cancel_all
+data:
+  entry_id: YOUR_ENTRY_ID
+```
+
 ## Example use cases
 
 - Turn something off in 30 minutes
@@ -144,6 +176,13 @@ See also:
 - Trigger an action when arriving home
 - Trigger an action when going to sleep
 - Trigger an action from a custom event such as `next_alarm`
+
+## Troubleshooting
+
+- If the popup does not open, confirm Browser Mod is installed and working.
+- If you use the popup launch from Lovelace, prefer the documented `fire-dom-event` pattern with `browser_id: THIS`.
+- If scheduled items do not run, check the Home Assistant logs for `scheduled_action`.
+- If the integration is installed manually, confirm the folder path is exactly `custom_components/scheduled_action/`.
 
 ## Notes
 
