@@ -1,0 +1,130 @@
+{
+  "title": "Scheduled Action",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Planner maken",
+        "description": "Maak een Scheduled Action-planner aan.",
+        "data": {
+          "name": "Naam"
+        }
+      },
+      "details": {
+        "title": "Plannerdetails",
+        "description": "Configureer presets en optionele triggerbronnen.",
+        "data": {
+          "preset_1": "Tijdpreset 1 (uren)",
+          "preset_2": "Tijdpreset 2 (uren)",
+          "preset_3": "Tijdpreset 3 (uren)",
+          "preset_4": "Tijdpreset 4 (uren)",
+          "home_state_entity": "Home-status entiteit",
+          "sleep_state_entity": "Slaapstatus entiteit",
+          "custom_event_1_label": "Label aangepast event 1",
+          "custom_event_1_name": "Naam aangepast event 1",
+          "custom_event_2_label": "Label aangepast event 2",
+          "custom_event_2_name": "Naam aangepast event 2"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Scheduled Action",
+        "description": "Kies wat je wilt bewerken.",
+        "data": {
+          "action": "Actie"
+        }
+      },
+      "manage_actions": {
+        "title": "Acties beheren",
+        "description": "Voeg vooraf gedefinieerde acties toe, bewerk ze of verwijder ze voor deze planner.",
+        "data": {
+          "manage_action": "Actiebeheer"
+        }
+      },
+      "select_action_to_edit": {
+        "title": "Kies actie om te bewerken",
+        "description": "Kies welke actie je wilt bewerken.",
+        "data": {
+          "action_id": "Actie"
+        }
+      },
+      "select_action_to_delete": {
+        "title": "Kies actie om te verwijderen",
+        "description": "Kies welke actie je wilt verwijderen.",
+        "data": {
+          "action_id": "Actie"
+        }
+      },
+      "add_action": {
+        "title": "Actie toevoegen",
+        "description": "Maak een vooraf gedefinieerde actie voor deze planner.",
+        "data": {
+          "label": "Label",
+          "target_entity_id": "Doelentiteit",
+          "action_type": "Actietype"
+        }
+      },
+      "edit_action": {
+        "title": "Actie bewerken",
+        "description": "Werk de geselecteerde vooraf gedefinieerde actie bij.",
+        "data": {
+          "label": "Label",
+          "target_entity_id": "Doelentiteit",
+          "action_type": "Actietype"
+        }
+      },
+      "delete_action": {
+        "title": "Actie verwijderen",
+        "description": "Verwijder de geselecteerde vooraf gedefinieerde actie.",
+        "data": {
+          "confirm": "Ik begrijp dat deze actie wordt verwijderd"
+        }
+      },
+      "edit_triggers": {
+        "title": "Triggers bewerken",
+        "description": "Werk presetvertragingen, gekoppelde statusentiteiten en aangepaste events bij.",
+        "data": {
+          "preset_1": "Tijdpreset 1 (uren)",
+          "preset_2": "Tijdpreset 2 (uren)",
+          "preset_3": "Tijdpreset 3 (uren)",
+          "preset_4": "Tijdpreset 4 (uren)",
+          "home_state_entity": "Home-status entiteit",
+          "sleep_state_entity": "Slaapstatus entiteit",
+          "custom_event_1_label": "Label aangepast event 1",
+          "custom_event_1_name": "Naam aangepast event 1",
+          "custom_event_2_label": "Label aangepast event 2",
+          "custom_event_2_name": "Naam aangepast event 2"
+        }
+      }
+    },
+    "error": {
+      "required": "Dit veld is verplicht.",
+      "duplicate_label": "Er bestaat al een actie met dit label.",
+      "invalid_entity_id": "Voer een geldige entiteit-ID in.",
+      "invalid_action_type": "Kies een geldig actietype."
+    },
+    "abort": {
+      "no_actions": "Er zijn nog geen acties geconfigureerd.",
+      "unknown_action": "Onbekende actie geselecteerd."
+    },
+    "selector": {
+      "action": {
+        "options": {
+          "add_action": "Actie toevoegen",
+          "edit_action": "Actie bewerken",
+          "edit_triggers": "Triggers bewerken",
+          "remove_action": "Actie verwijderen"
+        }
+      },
+      "manage_action": {
+        "options": {
+          "add_action": "Actie toevoegen",
+          "edit_action": "Actie bewerken",
+          "delete_action": "Actie verwijderen"
+        }
+      }
+    }
+  }
+}
