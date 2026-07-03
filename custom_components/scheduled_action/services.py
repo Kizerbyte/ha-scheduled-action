@@ -105,6 +105,19 @@ def _coordinator_for_entry(hass: HomeAssistant, entry_id: str):
     return hass.data.get(DOMAIN, {}).get(entry_id)
 
 
+def _require_coordinator_for_entry(hass: HomeAssistant, entry_id: str, service_name: str):
+    coordinator = _coordinator_for_entry(hass, entry_id)
+    if coordinator is None:
+        message = f"Unknown scheduled_action entry_id for {service_name}: {entry_id}"
+        _LOGGER.warning(
+            "%s; known_entry_ids=%s",
+            message,
+            sorted(hass.data.get(DOMAIN, {}).keys()),
+        )
+        raise HomeAssistantError(message)
+    return coordinator
+
+
 def _format_time_preset_label(hass: HomeAssistant, hours: float) -> str:
     if hours < 1:
         minutes = int(round(hours * 60))
@@ -276,14 +289,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
             browser_id,
             dict(call.data),
         )
-        coordinator = _coordinator_for_entry(hass, entry_id)
-        if coordinator is None:
-            _LOGGER.warning(
-                "open_popup: no coordinator found for entry_id=%s; known_entry_ids=%s",
-                entry_id,
-                sorted(hass.data.get(DOMAIN, {}).keys()),
-            )
-            return
+        coordinator = _require_coordinator_for_entry(hass, entry_id, SERVICE_OPEN_POPUP)
 
         popup = _popup_context_for_coordinator(coordinator)
         action_select_entity = popup.get("action_select_entity")
@@ -590,9 +596,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
 
     async def _schedule(call: ServiceCall) -> None:
         entry_id = str(call.data["entry_id"])
-        coordinator = _coordinator_for_entry(hass, entry_id)
-        if coordinator is None:
-            return
+        coordinator = _require_coordinator_for_entry(hass, entry_id, SERVICE_SCHEDULE)
 
         trigger = dict(call.data.get("trigger", {}))
         trigger_type = str(trigger.get("type", TRIGGER_DELAY))
@@ -683,38 +687,36 @@ async def async_register_services(hass: HomeAssistant) -> None:
     async def _cancel(call: ServiceCall) -> None:
         entry_id = str(call.data["entry_id"])
         item_id = str(call.data["item_id"])
-        coordinator = _coordinator_for_entry(hass, entry_id)
-        if coordinator is None:
-            return
+        coordinator = _require_coordinator_for_entry(hass, entry_id, SERVICE_CANCEL)
         coordinator.store.items = [item for item in coordinator.store.items if item.item_id != item_id]
         await coordinator.store.async_save()
         await coordinator.async_request_refresh()
 
     async def _cancel_all(call: ServiceCall) -> None:
         entry_id = str(call.data["entry_id"])
-        coordinator = _coordinator_for_entry(hass, entry_id)
-        if coordinator is None:
-            return
+        coordinator = _require_coordinator_for_entry(hass, entry_id, SERVICE_CANCEL_ALL)
         coordinator.store.items.clear()
         await coordinator.store.async_save()
         await coordinator.async_request_refresh()
 
     async def _fire_event(call: ServiceCall) -> None:
+        entry_id = str(call.data["entry_id"])
+        _require_coordinator_for_entry(hass, entry_id, SERVICE_FIRE_EVENT)
+        event_name = str(call.data["event_name"]).strip()
+        if not event_name:
+            raise HomeAssistantError("event_name is required for scheduled_action.fire_event")
         hass.bus.async_fire(
             EVENT_TYPE,
             {
-                "event_name": str(call.data["event_name"]),
-                "entry_id": call.data.get("entry_id"),
+                "event_name": event_name,
+                "entry_id": entry_id,
             },
         )
 
     async def _get_popup_context(call: ServiceCall) -> dict:
         entry_id = str(call.data["entry_id"])
         _LOGGER.debug("get_popup_context called: entry_id=%s raw_data=%s", entry_id, dict(call.data))
-        coordinator = _coordinator_for_entry(hass, entry_id)
-        if coordinator is None:
-            _LOGGER.warning("get_popup_context: no coordinator found for entry_id=%s", entry_id)
-            return {}
+        coordinator = _require_coordinator_for_entry(hass, entry_id, SERVICE_GET_POPUP_CONTEXT)
         context = _popup_context_for_coordinator(coordinator)
         _LOGGER.debug(
             "get_popup_context: returning scheduler=%s actions=%s time_presets=%s event_presets=%s",

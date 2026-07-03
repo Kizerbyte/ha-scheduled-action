@@ -447,18 +447,18 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
         if user_input is None:
             home_default = current.get(CONF_HOME_STATE_ENTITY)
             sleep_default = current.get(CONF_SLEEP_STATE_ENTITY)
-            use_home_trigger = isinstance(home_default, str) and "." in home_default
-            use_sleep_trigger = isinstance(sleep_default, str) and "." in sleep_default
-            use_timed_trigger_1 = presets[0] is not None
-            use_timed_trigger_2 = presets[1] is not None
-            use_timed_trigger_3 = presets[2] is not None
-            use_timed_trigger_4 = presets[3] is not None
+            enable_home_trigger = isinstance(home_default, str) and "." in home_default
+            enable_sleep_trigger = isinstance(sleep_default, str) and "." in sleep_default
+            enable_timed_trigger_1 = presets[0] is not None
+            enable_timed_trigger_2 = presets[1] is not None
+            enable_timed_trigger_3 = presets[2] is not None
+            enable_timed_trigger_4 = presets[3] is not None
             schema = vol.Schema(
                 {
-                    vol.Optional("use_timed_trigger_1", default=use_timed_trigger_1): bool,
-                    vol.Optional("use_timed_trigger_2", default=use_timed_trigger_2): bool,
-                    vol.Optional("use_timed_trigger_3", default=use_timed_trigger_3): bool,
-                    vol.Optional("use_timed_trigger_4", default=use_timed_trigger_4): bool,
+                    vol.Optional("enable_timed_trigger_1", default=enable_timed_trigger_1): bool,
+                    vol.Optional("enable_timed_trigger_2", default=enable_timed_trigger_2): bool,
+                    vol.Optional("enable_timed_trigger_3", default=enable_timed_trigger_3): bool,
+                    vol.Optional("enable_timed_trigger_4", default=enable_timed_trigger_4): bool,
                     vol.Optional(
                         "timed_trigger_1",
                         default="" if presets[0] is None else str(presets[0]),
@@ -475,15 +475,15 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                         "timed_trigger_4",
                         default="" if presets[3] is None else str(presets[3]),
                     ): str,
-                    vol.Optional("use_home_trigger", default=use_home_trigger): bool,
+                    vol.Optional("enable_home_trigger", default=enable_home_trigger): bool,
                     vol.Optional(
                         CONF_HOME_STATE_ENTITY,
-                        default=home_default if use_home_trigger else None,
+                        default=home_default if enable_home_trigger else None,
                     ): _boolean_entity_selector(),
-                    vol.Optional("use_sleep_trigger", default=use_sleep_trigger): bool,
+                    vol.Optional("enable_sleep_trigger", default=enable_sleep_trigger): bool,
                     vol.Optional(
                         CONF_SLEEP_STATE_ENTITY,
-                        default=sleep_default if use_sleep_trigger else None,
+                        default=sleep_default if enable_sleep_trigger else None,
                     ): _boolean_entity_selector(),
                 }
             )
@@ -491,10 +491,10 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
 
         preset_fields = ["timed_trigger_1", "timed_trigger_2", "timed_trigger_3", "timed_trigger_4"]
         toggle_fields = [
-            "use_timed_trigger_1",
-            "use_timed_trigger_2",
-            "use_timed_trigger_3",
-            "use_timed_trigger_4",
+            "enable_timed_trigger_1",
+            "enable_timed_trigger_2",
+            "enable_timed_trigger_3",
+            "enable_timed_trigger_4",
         ]
         time_presets_hours = _parse_toggled_time_presets(
             user_input,
@@ -504,12 +504,12 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
 
         home_state_entity = user_input.get(CONF_HOME_STATE_ENTITY)
         sleep_state_entity = user_input.get(CONF_SLEEP_STATE_ENTITY)
-        use_home_trigger = bool(user_input.get("use_home_trigger"))
-        use_sleep_trigger = bool(user_input.get("use_sleep_trigger"))
+        enable_home_trigger = bool(user_input.get("enable_home_trigger"))
+        enable_sleep_trigger = bool(user_input.get("enable_sleep_trigger"))
 
-        if not use_home_trigger or not isinstance(home_state_entity, str) or "." not in home_state_entity:
+        if not enable_home_trigger or not isinstance(home_state_entity, str) or "." not in home_state_entity:
             home_state_entity = None
-        if not use_sleep_trigger or not isinstance(sleep_state_entity, str) or "." not in sleep_state_entity:
+        if not enable_sleep_trigger or not isinstance(sleep_state_entity, str) or "." not in sleep_state_entity:
             sleep_state_entity = None
 
         return self.async_create_entry(
@@ -531,18 +531,18 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
         ] * (2 - len(current_events))
 
         if user_input is None:
-            use_custom_trigger_1 = bool(defaults[0]["label"] and defaults[0]["event_name"])
-            use_custom_trigger_2 = bool(defaults[1]["label"] and defaults[1]["event_name"])
+            enable_custom_trigger_1 = bool(defaults[0]["label"] and defaults[0]["event_name"])
+            enable_custom_trigger_2 = bool(defaults[1]["label"] and defaults[1]["event_name"])
             schema = vol.Schema(
                 {
-                    vol.Optional("use_custom_trigger_1", default=use_custom_trigger_1): bool,
+                    vol.Optional("enable_custom_trigger_1", default=enable_custom_trigger_1): bool,
                     vol.Optional("custom_trigger_1_label", default=defaults[0]["label"]): str,
                     vol.Optional("custom_trigger_1_name", default=defaults[0]["event_name"]): str,
                     vol.Optional(
                         "custom_trigger_1_icon",
                         default=defaults[0].get(CONF_ICON) or "mdi:alarm",
                     ): _icon_selector(),
-                    vol.Optional("use_custom_trigger_2", default=use_custom_trigger_2): bool,
+                    vol.Optional("enable_custom_trigger_2", default=enable_custom_trigger_2): bool,
                     vol.Optional("custom_trigger_2_label", default=defaults[1]["label"]): str,
                     vol.Optional("custom_trigger_2_name", default=defaults[1]["event_name"]): str,
                     vol.Optional(
@@ -555,7 +555,7 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
 
         custom_events = []
         for idx in (1, 2):
-            enabled = bool(user_input.get(f"use_custom_trigger_{idx}"))
+            enabled = bool(user_input.get(f"enable_custom_trigger_{idx}"))
             label = str(user_input.get(f"custom_trigger_{idx}_label", "")).strip()
             event_name = str(user_input.get(f"custom_trigger_{idx}_name", "")).strip()
             icon = str(user_input.get(f"custom_trigger_{idx}_icon", "")).strip() or "mdi:alarm"

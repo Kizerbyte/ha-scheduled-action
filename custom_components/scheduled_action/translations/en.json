@@ -115,17 +115,17 @@
         "title": "Standard triggers",
         "description": "Configure timed, home, and sleep triggers.",
         "data": {
-          "use_timed_trigger_1": "Use timed trigger 1",
-          "use_timed_trigger_2": "Use timed trigger 2",
-          "use_timed_trigger_3": "Use timed trigger 3",
-          "use_timed_trigger_4": "Use timed trigger 4",
+          "enable_timed_trigger_1": "Enable timed trigger 1",
+          "enable_timed_trigger_2": "Enable timed trigger 2",
+          "enable_timed_trigger_3": "Enable timed trigger 3",
+          "enable_timed_trigger_4": "Enable timed trigger 4",
           "timed_trigger_1": "Timed trigger 1 (hours)",
           "timed_trigger_2": "Timed trigger 2 (hours)",
           "timed_trigger_3": "Timed trigger 3 (hours)",
           "timed_trigger_4": "Timed trigger 4 (hours)",
-          "use_home_trigger": "Use home trigger",
+          "enable_home_trigger": "Enable home trigger",
           "home_state_entity": "Home state entity",
-          "use_sleep_trigger": "Use sleep trigger",
+          "enable_sleep_trigger": "Enable sleep trigger",
           "sleep_state_entity": "Sleep state entity"
         }
       },
@@ -133,11 +133,11 @@
         "title": "Custom triggers",
         "description": "Configure custom event triggers and icons.",
         "data": {
-          "use_custom_trigger_1": "Use custom trigger 1",
+          "enable_custom_trigger_1": "Enable custom trigger 1",
           "custom_trigger_1_label": "Custom trigger 1 label",
           "custom_trigger_1_name": "Custom trigger 1 name",
           "custom_trigger_1_icon": "Custom trigger 1 icon",
-          "use_custom_trigger_2": "Use custom trigger 2",
+          "enable_custom_trigger_2": "Enable custom trigger 2",
           "custom_trigger_2_label": "Custom trigger 2 label",
           "custom_trigger_2_name": "Custom trigger 2 name",
           "custom_trigger_2_icon": "Custom trigger 2 icon"
