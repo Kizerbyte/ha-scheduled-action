@@ -1,5 +1,33 @@
 {
   "title": "Scheduled Action",
+  "entity": {
+    "binary_sensor": {
+      "has_pending": {
+        "name": "Heeft wachtende acties"
+      }
+    },
+    "button": {
+      "clear_queue": {
+        "name": "Wachtrij legen"
+      }
+    },
+    "select": {
+      "actions": {
+        "name": "Acties"
+      }
+    },
+    "sensor": {
+      "queue_count": {
+        "name": "Aantal in wachtrij"
+      },
+      "queue": {
+        "name": "Wachtrij"
+      },
+      "next_action": {
+        "name": "Volgende actie"
+      }
+    }
+  },
   "config": {
     "step": {
       "user": {

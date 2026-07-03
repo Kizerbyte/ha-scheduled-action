@@ -14,7 +14,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class ScheduledActionClearQueueButton(ScheduledActionEntity, ButtonEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "clear_queue")
-        self._attr_name = "Clear queue"
+        self._attr_translation_key = "clear_queue"
         self._attr_icon = "mdi:playlist-remove"
 
     async def async_press(self) -> None:

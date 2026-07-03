@@ -1,5 +1,33 @@
 {
   "title": "Scheduled Action",
+  "entity": {
+    "binary_sensor": {
+      "has_pending": {
+        "name": "Has pending"
+      }
+    },
+    "button": {
+      "clear_queue": {
+        "name": "Clear queue"
+      }
+    },
+    "select": {
+      "actions": {
+        "name": "Actions"
+      }
+    },
+    "sensor": {
+      "queue_count": {
+        "name": "Queue count"
+      },
+      "queue": {
+        "name": "Queue"
+      },
+      "next_action": {
+        "name": "Next action"
+      }
+    }
+  },
   "config": {
     "step": {
       "user": {

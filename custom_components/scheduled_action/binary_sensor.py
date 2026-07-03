@@ -14,7 +14,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class ScheduledActionHasPendingBinarySensor(ScheduledActionEntity, BinarySensorEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "has_pending")
-        self._attr_name = "Has pending"
+        self._attr_translation_key = "has_pending"
         self._attr_icon = "mdi:timeline-clock-outline"
 
     @property

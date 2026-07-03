@@ -72,7 +72,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class ScheduledActionQueueCountSensor(ScheduledActionEntity, SensorEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "queue_count")
-        self._attr_name = "Queue count"
+        self._attr_translation_key = "queue_count"
         self._attr_icon = "mdi:playlist-edit"
 
     @property
@@ -96,7 +96,7 @@ class ScheduledActionQueueCountSensor(ScheduledActionEntity, SensorEntity):
 class ScheduledActionQueueSensor(ScheduledActionEntity, SensorEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "queue")
-        self._attr_name = "Queue"
+        self._attr_translation_key = "queue"
         self._attr_icon = "mdi:format-list-bulleted"
 
     @property
@@ -122,7 +122,7 @@ class ScheduledActionQueueSensor(ScheduledActionEntity, SensorEntity):
 class ScheduledActionNextActionSensor(ScheduledActionEntity, SensorEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "next_action")
-        self._attr_name = "Next action"
+        self._attr_translation_key = "next_action"
         self._attr_icon = "mdi:clock-end"
 
     @property

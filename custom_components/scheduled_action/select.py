@@ -14,7 +14,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class ScheduledActionActionSelect(ScheduledActionEntity, SelectEntity):
     def __init__(self, coordinator) -> None:
         super().__init__(coordinator, "action_select")
-        self._attr_name = "Actions"
+        self._attr_translation_key = "actions"
         self._attr_icon = "mdi:format-list-bulleted"
         self._attr_current_option = None
 
