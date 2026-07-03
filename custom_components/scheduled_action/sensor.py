@@ -5,7 +5,7 @@ from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, TRIGGER_DELAY, TRIGGER_EVENT, TRIGGER_HOME, TRIGGER_AWAY, TRIGGER_ASLEEP, TRIGGER_AWAKE
 from .entity_base import ScheduledActionEntity
-from .text_utils import format_action_key, format_trigger_type, normalize_trigger_label
+from .text_utils import format_action_key, format_trigger_type, normalize_trigger_label, strip_trigger_suffix
 
 
 _TRANSLATIONS = {
@@ -69,10 +69,7 @@ def _trigger_display_text(coordinator, item) -> str:
 
 
 def _describe_queue_item(coordinator, item) -> str:
-    if item.label:
-        return str(item.label).strip()
-
-    action_label = format_action_key(item.action)
+    action_label = strip_trigger_suffix(item.label) if item.label else format_action_key(item.action)
 
     if item.trigger_type == TRIGGER_DELAY and item.due_at:
         parsed = dt_util.parse_datetime(item.due_at)
@@ -85,7 +82,7 @@ def _describe_queue_item(coordinator, item) -> str:
 
 def _queue_item_display_dict(item) -> dict:
     return {
-        "label": str(item.label).strip() if item.label else format_action_key(item.action),
+        "label": strip_trigger_suffix(item.label) if item.label else format_action_key(item.action),
         "target_entity_id": item.target_entity_id,
         "action": format_action_key(item.action),
         "trigger_type": format_trigger_type(item.trigger_type),
