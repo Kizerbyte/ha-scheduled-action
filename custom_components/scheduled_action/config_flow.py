@@ -42,6 +42,7 @@ def _boolean_entity_selector():
                     {"domain": "binary_sensor"},
                     {"domain": "switch"},
                 ],
+                "allow_none": True,
             }
         }
     )
@@ -102,6 +103,17 @@ def _parse_optional_float(value) -> float | None:
     return float(text)
 
 
+def _parse_time_presets(user_input: dict, field_names: list[str]) -> list[float | None]:
+    presets: list[float | None] = []
+    for field_name in field_names:
+        presets.append(_parse_optional_float(user_input.get(field_name)))
+
+    while presets and presets[-1] is None:
+        presets.pop()
+
+    return presets
+
+
 class ScheduledActionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
@@ -144,11 +156,10 @@ class ScheduledActionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     {"label": label, "event_name": event_name, CONF_ICON: icon}
                 )
 
-        time_presets_hours = []
-        for idx in range(1, 5):
-            value = _parse_optional_float(user_input.get(f"preset_{idx}"))
-            if value is not None:
-                time_presets_hours.append(value)
+        time_presets_hours = _parse_time_presets(
+            user_input,
+            ["preset_1", "preset_2", "preset_3", "preset_4"],
+        )
 
         data = {
             **self._user_input,
@@ -482,11 +493,10 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                     {"label": label, "event_name": event_name, CONF_ICON: icon}
                 )
 
-        time_presets_hours = []
-        for idx in range(1, 5):
-            value = _parse_optional_float(user_input.get(f"preset_{idx}"))
-            if value is not None:
-                time_presets_hours.append(value)
+        time_presets_hours = _parse_time_presets(
+            user_input,
+            ["preset_1", "preset_2", "preset_3", "preset_4"],
+        )
 
         return self.async_create_entry(
             title="",
