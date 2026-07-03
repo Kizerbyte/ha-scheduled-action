@@ -261,6 +261,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                     "show_state": False,
                     "name": preset_label,
                     "icon": _delay_icon(float(preset_hours)),
+                    "icon_height": "32px",
                     "tap_action": {
                         "action": "call-service",
                         "service": "script.scheduled_action_schedule_from_select",

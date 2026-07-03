@@ -432,8 +432,8 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_edit_triggers(self, user_input=None):
         choices = {
-            "custom_triggers": "Custom triggers",
-            "standard_triggers": "Standard triggers",
+            "custom_triggers": "Custom event triggers",
+            "standard_triggers": "Timed triggers",
         }
 
         if user_input is None:
@@ -465,21 +465,21 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
             schema = vol.Schema(
                 {
                     vol.Optional("use_preset_1", default=use_preset_1): bool,
+                    vol.Optional("use_preset_2", default=use_preset_2): bool,
+                    vol.Optional("use_preset_3", default=use_preset_3): bool,
+                    vol.Optional("use_preset_4", default=use_preset_4): bool,
                     vol.Optional(
                         "preset_1",
                         default="" if presets[0] is None else str(presets[0]),
                     ): str,
-                    vol.Optional("use_preset_2", default=use_preset_2): bool,
                     vol.Optional(
                         "preset_2",
                         default="" if presets[1] is None else str(presets[1]),
                     ): str,
-                    vol.Optional("use_preset_3", default=use_preset_3): bool,
                     vol.Optional(
                         "preset_3",
                         default="" if presets[2] is None else str(presets[2]),
                     ): str,
-                    vol.Optional("use_preset_4", default=use_preset_4): bool,
                     vol.Optional(
                         "preset_4",
                         default="" if presets[3] is None else str(presets[3]),
@@ -537,14 +537,18 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
         ] * (2 - len(current_events))
 
         if user_input is None:
+            use_custom_event_1 = bool(defaults[0]["label"] and defaults[0]["event_name"])
+            use_custom_event_2 = bool(defaults[1]["label"] and defaults[1]["event_name"])
             schema = vol.Schema(
                 {
+                    vol.Optional("use_custom_event_1", default=use_custom_event_1): bool,
                     vol.Optional("custom_event_1_label", default=defaults[0]["label"]): str,
                     vol.Optional("custom_event_1_name", default=defaults[0]["event_name"]): str,
                     vol.Optional(
                         "custom_event_1_icon",
                         default=defaults[0].get(CONF_ICON) or "mdi:alarm",
                     ): _icon_selector(),
+                    vol.Optional("use_custom_event_2", default=use_custom_event_2): bool,
                     vol.Optional("custom_event_2_label", default=defaults[1]["label"]): str,
                     vol.Optional("custom_event_2_name", default=defaults[1]["event_name"]): str,
                     vol.Optional(
@@ -557,10 +561,11 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
 
         custom_events = []
         for idx in (1, 2):
+            enabled = bool(user_input.get(f"use_custom_event_{idx}"))
             label = str(user_input.get(f"custom_event_{idx}_label", "")).strip()
             event_name = str(user_input.get(f"custom_event_{idx}_name", "")).strip()
             icon = str(user_input.get(f"custom_event_{idx}_icon", "")).strip() or "mdi:alarm"
-            if label and event_name:
+            if enabled and label and event_name:
                 custom_events.append(
                     {"label": label, "event_name": event_name, CONF_ICON: icon}
                 )
