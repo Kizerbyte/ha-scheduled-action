@@ -1,10 +1,10 @@
-# Scheduled Action
-
 <p align="center">
   <img src="assets/icon.jpg" alt="Scheduled Action icon" width="180">
 </p>
 
-<p align="center">
+# Scheduled Action
+
+<p align="left">
   <a href="https://hacs.xyz/">
     <img src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge" alt="HACS Custom">
   </a>
@@ -13,27 +13,32 @@
   </a>
 </p>
 
-Home Assistant custom component to schedule predefined actions using delays, state-based triggers, and custom events.
 
-`Scheduled Action` is useful when you want a lightweight scheduler that can:
-- queue an action for later
-- trigger actions when you get home or leave
-- trigger actions when you fall asleep or wake up
-- react to custom events
-- offer a popup-based scheduling UI through Browser Mod
+
+
+A custom component for a delayed or scheduled action, **able to trigger anything** that can be pressed, toggled, or turned on/off!
+Annoyed by an automation that fires **only** on a regular schedule or trigger? Look no further as this is for the occasional or irregular scheduled actions!
+
+<q>I only want my coffee to brew when I've actually put a cup under it and plan on it</q>
+
+<q>My airco should turn on an hour before I wake up, but only for this hot night</q>
+
+
+You can spawn an integration entry that holds its own triggers and actions, so have as many as you like.
 
 ## Features
+- Queue an action for later
+  - Trigger actions when you get home or leave
+  - Trigger actions when you fall asleep or wake up
+  - React to custom events
+  - Clear queue
+- Popup-based scheduling UI through [Browser Mod](https://github.com/thomasloven/hass-browser_mod)
+  - Front-end flexibility, requiring only a fire-dom-event call!
+- Infinitely many different configurations, referenced by 'entry_id'!
+  - Hide unwanted triggers from the popup
 
-- Config flow support
-- Multiple configured actions per scheduler
-- Delay presets
-- Home / away triggers
-- Asleep / awake triggers
-- Custom event triggers
-- Queue sensor
-- Next action sensor
-- Clear queue button
-- Browser Mod popup support through `scheduled_action.open_popup`
+![Popup preview](images/Airco-popup-preview-queue.png)
+
 
 ## Installation
 
@@ -67,45 +72,7 @@ config/
 ```
 
 ## Configuration
-
-This integration is configured through the Home Assistant UI.
-
-During setup you can configure:
-- scheduler name
-- delay presets
-- optional home-state entity
-- optional sleep-state entity
-- optional custom events
-
-After setup, the options flow lets you:
-- add actions
-- edit actions
-- remove actions
-- edit triggers
-
-## How it works
-
-A scheduler entry contains:
-- one or more predefined actions
-- a set of preset delays
-- optional state triggers
-- optional custom event triggers
-
-When something is scheduled, it is added to the queue.
-The integration then exposes queue state through entities and executes the action when its trigger condition is met.
-
-## Entities
-
-Depending on your scheduler configuration, the integration exposes entities such as:
-
-- **Select**: choose the active action
-- **Button**: clear queue
-- **Binary sensor**: whether items are pending
-- **Sensor**: queue count
-- **Sensor**: queue
-- **Sensor**: next action
-
-## Popup support
+### Popup call
 
 This integration can open a Browser Mod popup through the integration-owned service:
 
@@ -125,12 +92,47 @@ tap_action:
 
 Why this pattern:
 - Browser Mod resolves `browser_id: THIS` correctly in the `fire-dom-event` path.
-- A plain Lovelace `perform-action` call is **not** the recommended public entry point for opening this popup.
 - The integration handles popup content generation itself, so the dashboard YAML stays small.
 
-More popup details and examples are included here:
-- `custom_components/scheduled_action/README_popup_bridge.md`
-- `custom_components/scheduled_action/EXAMPLE_popup_bridge.yaml`
+### Entry config
+
+This integration is configured through the Home Assistant UI.
+
+During setup you can configure:
+- scheduler name
+- timed triggers
+- optional home-state entity
+- optional sleep-state entity
+- optional custom events
+
+After setup, the options flow lets you:
+- add actions
+- edit actions
+- remove actions
+- edit triggers
+- enable/disable each trigger
+
+## How it works
+
+A scheduler entry contains:
+- one or more predefined actions
+- a set of timed triggers
+- optional state triggers
+- optional custom event triggers
+
+When something is scheduled, it is added to the queue.
+The integration then exposes queue state through entities and executes the action when its trigger condition is met.
+
+## Entities
+
+Depending on your scheduler configuration, the integration exposes entities such as:
+
+- **Button**: clear queue
+- **Binary sensor**: whether items are pending
+- **Sensor**: queue count (+ metadata)
+- **Sensor**: queue (+ markdown text)
+- **Sensor**: next action
+
 
 ## Services
 
@@ -183,30 +185,11 @@ data:
 - Trigger an action when going to sleep
 - Trigger an action from a custom event such as `next_alarm`
 
-## Troubleshooting
-
-- If the popup does not open, confirm Browser Mod is installed and working.
-- If you use the popup launch from Lovelace, prefer the documented `fire-dom-event` pattern with `browser_id: THIS`.
-- If scheduled items do not run, check the Home Assistant logs for `scheduled_action`.
-- If the integration is installed manually, confirm the folder path is exactly `custom_components/scheduled_action/`.
-
 ## Notes
 
 - Browser Mod is optional, but recommended if you want the popup flow.
 - The popup flow is designed so the backend owns the popup context and scheduler logic.
-- The recommended Browser Mod target is `browser_id: THIS`.
 
-## Repository contents
-
-Main integration code lives in:
-
-- `custom_components/scheduled_action/`
-
-Supporting docs included in the repo:
-
-- `custom_components/scheduled_action/README_popup_bridge.md`
-- `custom_components/scheduled_action/EXAMPLE_popup_bridge.yaml`
-- `assets/ATTRIBUTION.md`\n
 ## License
 
 See `LICENSE`.
