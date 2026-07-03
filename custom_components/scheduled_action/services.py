@@ -5,6 +5,7 @@ import logging
 import uuid
 
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 
@@ -553,6 +554,11 @@ async def async_register_services(hass: HomeAssistant) -> None:
                     "features_position": "bottom",
                 }
             )
+
+        if not hass.services.has_service("browser_mod", "popup"):
+            message = "Browser Mod is required for scheduled_action.open_popup"
+            _LOGGER.warning("open_popup: %s", message)
+            raise HomeAssistantError(message)
 
         _LOGGER.debug(
             "open_popup: calling browser_mod.popup browser_id=%r title=%r card_count=%s",
