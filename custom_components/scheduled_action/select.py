@@ -16,7 +16,6 @@ class ScheduledActionActionSelect(ScheduledActionEntity, SelectEntity):
         super().__init__(coordinator, "action_select")
         self._attr_name = "Actions"
         self._attr_icon = "mdi:format-list-bulleted"
-        self._attr_entity_registry_enabled_default = False
         self._attr_current_option = None
 
     @property
