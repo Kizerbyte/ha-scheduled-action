@@ -626,9 +626,34 @@ async def async_register_services(hass: HomeAssistant) -> None:
         action_label = normalize_label(
             call.data.get("label") or (selected_action.label if selected_action is not None else None)
         )
-        trigger_label = normalize_trigger_label(call.data.get("trigger_label"))
+        trigger_label = str(call.data.get("trigger_label") or "").strip()
         merged_label = action_label
-        if action_label and trigger_label:
+
+        if trigger_type == TRIGGER_DELAY and due_at:
+            parsed = dt_util.parse_datetime(due_at)
+            if parsed is not None:
+                local_dt = dt_util.as_local(parsed)
+                time_text = local_dt.strftime("%H:%M")
+                merged_label = _text(hass, "at_time", action=action_label, time=time_text)
+        elif trigger_type in {TRIGGER_HOME, TRIGGER_AWAY, TRIGGER_ASLEEP, TRIGGER_AWAKE}:
+            trigger_text_map = {
+                TRIGGER_HOME: _text(hass, "when_home").lower(),
+                TRIGGER_AWAY: _text(hass, "when_away").lower(),
+                TRIGGER_ASLEEP: _text(hass, "when_asleep").lower(),
+                TRIGGER_AWAKE: _text(hass, "when_awake").lower(),
+            }
+            trigger_text = trigger_text_map.get(trigger_type, "")
+            if action_label and trigger_text:
+                merged_label = f"{action_label} {trigger_text}"
+            elif trigger_text:
+                merged_label = trigger_text
+        elif trigger_type == TRIGGER_EVENT and trigger_label:
+            trigger_text = _text(hass, "on_label", label=normalize_trigger_label(trigger_label))
+            if action_label:
+                merged_label = f"{action_label} {trigger_text}"
+            else:
+                merged_label = trigger_text
+        elif action_label and trigger_label:
             merged_label = f"{action_label} {trigger_label}"
         elif trigger_label:
             merged_label = trigger_label

@@ -114,7 +114,6 @@
       },
       "edit_triggers": {
         "title": "Triggers bewerken",
-        "description": "Kies welke triggergroep je wilt bewerken.",
         "data": {
           "trigger_group": "Kies groep"
         }
