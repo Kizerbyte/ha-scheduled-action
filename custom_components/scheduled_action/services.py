@@ -223,7 +223,11 @@ async def async_register_services(hass: HomeAssistant) -> None:
         )
         coordinator = _coordinator_for_entry(hass, entry_id)
         if coordinator is None:
-            _LOGGER.warning("open_popup: no coordinator found for entry_id=%s", entry_id)
+            _LOGGER.warning(
+                "open_popup: no coordinator found for entry_id=%s; known_entry_ids=%s",
+                entry_id,
+                sorted(hass.data.get(DOMAIN, {}).keys()),
+            )
             return
 
         popup = _popup_context_for_coordinator(coordinator)
@@ -547,6 +551,12 @@ async def async_register_services(hass: HomeAssistant) -> None:
         if action_id:
             selected_action = next((item for item in coordinator.scheduler.actions if item.id == action_id), None)
             if selected_action is None:
+                _LOGGER.warning(
+                    "schedule: unknown action_id=%s for entry_id=%s; available_action_ids=%s",
+                    action_id,
+                    entry_id,
+                    [item.id for item in coordinator.scheduler.actions if item.id],
+                )
                 return
 
         target_entity_id = str(call.data.get("target_entity_id", "")).strip()
