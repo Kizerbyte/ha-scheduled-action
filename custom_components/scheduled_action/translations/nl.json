@@ -13,18 +13,18 @@
         "title": "Plannerdetails",
         "description": "Configureer presets en optionele triggerbronnen.",
         "data": {
-          "preset_1": "Tijdpreset 1 (uren)",
-          "preset_2": "Tijdpreset 2 (uren)",
-          "preset_3": "Tijdpreset 3 (uren)",
-          "preset_4": "Tijdpreset 4 (uren)",
+          "timed_trigger_1": "Tijdtrigger 1 (uren)",
+          "timed_trigger_2": "Tijdtrigger 2 (uren)",
+          "timed_trigger_3": "Tijdtrigger 3 (uren)",
+          "timed_trigger_4": "Tijdtrigger 4 (uren)",
           "home_state_entity": "Home-status entiteit",
           "sleep_state_entity": "Slaapstatus entiteit",
-          "custom_event_1_label": "Label aangepast event 1",
-          "custom_event_1_name": "Naam aangepast event 1",
-          "custom_event_1_icon": "Icoon aangepast event 1",
-          "custom_event_2_label": "Label aangepast event 2",
-          "custom_event_2_name": "Naam aangepast event 2",
-          "custom_event_2_icon": "Icoon aangepast event 2"
+          "custom_trigger_1_label": "Label custom trigger 1",
+          "custom_trigger_1_name": "Naam custom trigger 1",
+          "custom_trigger_1_icon": "Icoon custom trigger 1",
+          "custom_trigger_2_label": "Label custom trigger 2",
+          "custom_trigger_2_name": "Naam custom trigger 2",
+          "custom_trigger_2_icon": "Icoon custom trigger 2"
         }
       }
     }
@@ -86,20 +86,19 @@
       },
       "edit_triggers": {
         "title": "Triggers bewerken",
-        "description": "Werk presetvertragingen, gekoppelde statusentiteiten en aangepaste events bij.",
         "data": {
-          "preset_1": "Tijdpreset 1 (uren)",
-          "preset_2": "Tijdpreset 2 (uren)",
-          "preset_3": "Tijdpreset 3 (uren)",
-          "preset_4": "Tijdpreset 4 (uren)",
+          "timed_trigger_1": "Tijdtrigger 1 (uren)",
+          "timed_trigger_2": "Tijdtrigger 2 (uren)",
+          "timed_trigger_3": "Tijdtrigger 3 (uren)",
+          "timed_trigger_4": "Tijdtrigger 4 (uren)",
           "home_state_entity": "Home-status entiteit",
           "sleep_state_entity": "Slaapstatus entiteit",
-          "custom_event_1_label": "Label aangepast event 1",
-          "custom_event_1_name": "Naam aangepast event 1",
-          "custom_event_1_icon": "Icoon aangepast event 1",
-          "custom_event_2_label": "Label aangepast event 2",
-          "custom_event_2_name": "Naam aangepast event 2",
-          "custom_event_2_icon": "Icoon aangepast event 2"
+          "custom_trigger_1_label": "Label custom trigger 1",
+          "custom_trigger_1_name": "Naam custom trigger 1",
+          "custom_trigger_1_icon": "Icoon custom trigger 1",
+          "custom_trigger_2_label": "Label custom trigger 2",
+          "custom_trigger_2_name": "Naam custom trigger 2",
+          "custom_trigger_2_icon": "Icoon custom trigger 2"
         }
       }
     },

@@ -13,18 +13,18 @@
         "title": "Scheduler details",
         "description": "Configure presets and optional trigger sources.",
         "data": {
-          "preset_1": "Time preset 1 (hours)",
-          "preset_2": "Time preset 2 (hours)",
-          "preset_3": "Time preset 3 (hours)",
-          "preset_4": "Time preset 4 (hours)",
+          "timed_trigger_1": "Timed trigger 1 (hours)",
+          "timed_trigger_2": "Timed trigger 2 (hours)",
+          "timed_trigger_3": "Timed trigger 3 (hours)",
+          "timed_trigger_4": "Timed trigger 4 (hours)",
           "home_state_entity": "Home state entity",
           "sleep_state_entity": "Sleep state entity",
-          "custom_event_1_label": "Custom event 1 label",
-          "custom_event_1_name": "Custom event 1 name",
-          "custom_event_1_icon": "Custom event 1 icon",
-          "custom_event_2_label": "Custom event 2 label",
-          "custom_event_2_name": "Custom event 2 name",
-          "custom_event_2_icon": "Custom event 2 icon"
+          "custom_trigger_1_label": "Custom trigger 1 label",
+          "custom_trigger_1_name": "Custom trigger 1 name",
+          "custom_trigger_1_icon": "Custom trigger 1 icon",
+          "custom_trigger_2_label": "Custom trigger 2 label",
+          "custom_trigger_2_name": "Custom trigger 2 name",
+          "custom_trigger_2_icon": "Custom trigger 2 icon"
         }
       }
     }
@@ -86,20 +86,19 @@
       },
       "edit_triggers": {
         "title": "Edit triggers",
-        "description": "Update preset delays, linked state entities, and custom events.",
         "data": {
-          "preset_1": "Time preset 1 (hours)",
-          "preset_2": "Time preset 2 (hours)",
-          "preset_3": "Time preset 3 (hours)",
-          "preset_4": "Time preset 4 (hours)",
+          "timed_trigger_1": "Timed trigger 1 (hours)",
+          "timed_trigger_2": "Timed trigger 2 (hours)",
+          "timed_trigger_3": "Timed trigger 3 (hours)",
+          "timed_trigger_4": "Timed trigger 4 (hours)",
           "home_state_entity": "Home state entity",
           "sleep_state_entity": "Sleep state entity",
-          "custom_event_1_label": "Custom event 1 label",
-          "custom_event_1_name": "Custom event 1 name",
-          "custom_event_1_icon": "Custom event 1 icon",
-          "custom_event_2_label": "Custom event 2 label",
-          "custom_event_2_name": "Custom event 2 name",
-          "custom_event_2_icon": "Custom event 2 icon"
+          "custom_trigger_1_label": "Custom trigger 1 label",
+          "custom_trigger_1_name": "Custom trigger 1 name",
+          "custom_trigger_1_icon": "Custom trigger 1 icon",
+          "custom_trigger_2_label": "Custom trigger 2 label",
+          "custom_trigger_2_name": "Custom trigger 2 name",
+          "custom_trigger_2_icon": "Custom trigger 2 icon"
         }
       }
     },
