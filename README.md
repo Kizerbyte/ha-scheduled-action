@@ -1,5 +1,8 @@
 # Scheduled Action
 
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://hacs.xyz/)
+[![GitHub Release](https://img.shields.io/github/v/release/Kizerbyte/ha-scheduled-action?style=for-the-badge)](https://github.com/Kizerbyte/ha-scheduled-action/releases)
+
 Home Assistant custom component to schedule actions for entities using delays, state-based triggers, and custom events.
 
 `Scheduled Action` is useful when you want a lightweight scheduler that can:
@@ -23,6 +26,17 @@ Home Assistant custom component to schedule actions for entities using delays, s
 - Browser Mod popup support through `scheduled_action.open_popup`
 
 ## Installation
+
+### HACS (Custom Repository)
+
+1. Open **HACS**
+2. Go to **⋮ → Custom repositories**
+3. Add repository:
+   - **Repository**: `https://github.com/Kizerbyte/ha-scheduled-action`
+   - **Category**: `Integration`
+4. Search for **Scheduled Action**
+5. Install
+6. Restart Home Assistant
 
 ### Manual
 
@@ -133,26 +147,16 @@ See also:
 - The popup flow is designed so the backend owns the popup context and scheduler logic.
 - The recommended Browser Mod target is `browser_id: THIS`.
 
-## Project status
-
-This project is active and evolving.
-Current focus has been on:
-- popup UX
-- queue clarity
-- config flow improvements
-- internal cleanup and consistency
-
 ## Repository contents
 
 Main integration code lives in:
 
 - `custom_components/scheduled_action/`
 
-Supporting docs currently included in the repo:
+Supporting docs included in the repo:
 
 - `custom_components/scheduled_action/README_popup_bridge.md`
 - `custom_components/scheduled_action/EXAMPLE_popup_bridge.yaml`
-- `custom_components/scheduled_action/PROPOSAL.md`
 
 ## License
 
