@@ -4,8 +4,14 @@
   <img src="assets/icon.jpg" alt="Scheduled Action icon" width="180">
 </p>
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://hacs.xyz/)
-[![GitHub Release](https://img.shields.io/github/v/release/Kizerbyte/ha-scheduled-action?style=for-the-badge)](https://github.com/Kizerbyte/ha-scheduled-action/releases)
+<p align="center">
+  <a href="https://hacs.xyz/">
+    <img src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge" alt="HACS Custom">
+  </a>
+  <a href="https://github.com/Kizerbyte/ha-scheduled-action/releases">
+    <img src="https://img.shields.io/github/v/release/Kizerbyte/ha-scheduled-action?style=for-the-badge" alt="GitHub Release">
+  </a>
+</p>
 
 Home Assistant custom component to schedule predefined actions using delays, state-based triggers, and custom events.
 
