@@ -28,7 +28,7 @@ from .const import (
     TRIGGER_HOME,
 )
 from .storage import QueueItem
-from .text_utils import normalize_label, normalize_trigger_label, strip_trigger_suffix
+from .text_utils import normalize_label, normalize_trigger_label
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -559,6 +559,16 @@ async def async_register_services(hass: HomeAssistant) -> None:
         if not target_entity_id or not action:
             return
 
+        action_label = normalize_label(
+            call.data.get("label") or (selected_action.label if selected_action is not None else None)
+        )
+        trigger_label = normalize_trigger_label(call.data.get("trigger_label"))
+        merged_label = action_label
+        if action_label and trigger_label:
+            merged_label = f"{action_label} {trigger_label}"
+        elif trigger_label:
+            merged_label = trigger_label
+
         item = QueueItem(
             item_id=uuid.uuid4().hex,
             action_id=selected_action.id if selected_action is not None else None,
@@ -568,8 +578,8 @@ async def async_register_services(hass: HomeAssistant) -> None:
             trigger_data=trigger,
             created_at=dt_util.now().isoformat(),
             due_at=due_at,
-            label=strip_trigger_suffix(call.data.get("label") or (selected_action.label if selected_action is not None else None)),
-            trigger_label=normalize_trigger_label(call.data.get("trigger_label")),
+            label=merged_label,
+            trigger_label=trigger_label,
         )
         coordinator.store.items.append(item)
         await coordinator.store.async_save()
