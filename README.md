@@ -177,6 +177,52 @@ data:
   entry_id: YOUR_ENTRY_ID
 ```
 
+### Example: fire a custom event from an automation
+
+Use the integration service instead of firing the internal event bus event directly.
+
+```yaml
+alias: Alarm -> scheduled action event
+description: ""
+triggers:
+  - trigger: state
+    entity_id: sensor.saas_floris_alarm_event
+    to: "Alarm Alert Started"
+    id: alarm
+
+  - trigger: state
+    entity_id: sensor.saas_floris_alarm_event
+    to: "Before Alarm"
+    id: before
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: alarm
+        sequence:
+          - action: scheduled_action.fire_event
+            data:
+              entry_id: YOUR_ENTRY_ID
+              event_name: next_alarm
+
+      - conditions:
+          - condition: trigger
+            id: before
+        sequence:
+          - action: scheduled_action.fire_event
+            data:
+              entry_id: YOUR_ENTRY_ID
+              event_name: 1h_before_alarm
+
+mode: parallel
+```
+
+Notes:
+- Prefer `scheduled_action.fire_event` over firing the internal event directly.
+- Include `entry_id` if you have more than one scheduler instance.
+- If no queued item is waiting for that `event_name`, nothing happens; this is a safe no-op.
+
 ## Example use cases
 
 - Turn something off in 30 minutes
