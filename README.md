@@ -37,14 +37,15 @@ You can spawn an integration entry that holds its own triggers and actions, so h
 - Infinitely many different configurations, referenced by 'entry_id'!
   - Hide unwanted triggers from the popup
 
--->[CODE EXAMPLES](#code-examples)<--
-
-![Popup preview](images/Airco-popup-preview-queue.png)
-
-### Notes
-
+### Note
 - Browser Mod is optional, but recommended if you want the popup flow.
 - The popup flow is designed so the backend owns the popup context and scheduler logic.
+
+
+**-->[CODE EXAMPLES](#code-examples)<--**
+
+![Popup preview](images/Airco-popup-preview-queue.png)
+![Popup preview](images/integration-entries.png)
 
 ---
 
@@ -97,6 +98,8 @@ After setup, the options flow lets you:
 - edit triggers
 - enable/disable each trigger
 
+<img src="images/blinds-popup-preview.png" alt="Popup preview" width="500"> <img src="images/coffee-popup-preview.png" alt="Popup preview" width="500">
+
 ## How it works
 
 A scheduler entry contains:
@@ -116,16 +119,19 @@ The integration then exposes queue state through entities and executes the actio
 - Trigger an action when going to sleep
 - Trigger an action from a custom event such as `next_alarm`
 
+![Popup preview](images/entry-action-editor.png)
+
 ## Entities
 
 Depending on your scheduler configuration, the integration exposes entities such as:
 
 - **Button**: clear queue
 - **Binary sensor**: whether items are pending
-- **Sensor**: queue count (+ metadata)
-- **Sensor**: queue (+ markdown text)
 - **Sensor**: next action
+- **Sensor**: queue (+ markdown text)
+- **Sensor**: queue count (+ metadata)
 
+![Popup preview](images/Airco-sensors.png)
 
 ## Services
 
@@ -189,6 +195,8 @@ Notes:
 - Prefer `scheduled_action.fire_event` over firing the internal event directly.
 - Include `entry_id` if you have more than one scheduler instance.
 - If no queued item is waiting for that `event_name`, nothing happens; this is a safe no-op.
+
+![Popup preview](images/custom-event-triggers.png)
 
 ### Schedule an action
 #### Time based
