@@ -6,7 +6,7 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 
-from .const import DEFAULT_TIME_PRESETS_HOURS, DOMAIN
+from .const import CONF_ICON, DEFAULT_TIME_PRESETS_HOURS, DOMAIN
 
 STORAGE_VERSION = 1
 
@@ -19,12 +19,14 @@ def _store_key(entry_id: str) -> str:
 class CustomEventDef:
     label: str
     event_name: str
+    icon: str | None = None
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> "CustomEventDef":
         return CustomEventDef(
             label=str(data.get("label", "")).strip(),
             event_name=str(data.get("event_name", "")).strip(),
+            icon=str(data.get(CONF_ICON, "")).strip() or None,
         )
 
 

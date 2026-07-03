@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import re
+import unicodedata
+
 
 def normalize_label(value: str | None) -> str:
     value = str(value or "").strip()
@@ -39,3 +42,10 @@ def format_trigger_type(value: str) -> str:
     if not value:
         return ""
     return value.replace("_", " ").capitalize()
+
+
+def sort_normalized_label(value: str | None) -> str:
+    normalized = unicodedata.normalize("NFKD", normalize_label(value))
+    ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
+    collapsed = re.sub(r"\s+", " ", ascii_value).strip().casefold()
+    return collapsed

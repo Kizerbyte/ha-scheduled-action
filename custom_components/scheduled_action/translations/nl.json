@@ -21,8 +21,10 @@
           "sleep_state_entity": "Slaapstatus entiteit",
           "custom_event_1_label": "Label aangepast event 1",
           "custom_event_1_name": "Naam aangepast event 1",
+          "custom_event_1_icon": "Icoon aangepast event 1",
           "custom_event_2_label": "Label aangepast event 2",
-          "custom_event_2_name": "Naam aangepast event 2"
+          "custom_event_2_name": "Naam aangepast event 2",
+          "custom_event_2_icon": "Icoon aangepast event 2"
         }
       }
     }
@@ -94,8 +96,10 @@
           "sleep_state_entity": "Slaapstatus entiteit",
           "custom_event_1_label": "Label aangepast event 1",
           "custom_event_1_name": "Naam aangepast event 1",
+          "custom_event_1_icon": "Icoon aangepast event 1",
           "custom_event_2_label": "Label aangepast event 2",
-          "custom_event_2_name": "Naam aangepast event 2"
+          "custom_event_2_name": "Naam aangepast event 2",
+          "custom_event_2_icon": "Icoon aangepast event 2"
         }
       }
     },
@@ -123,6 +127,14 @@
           "add_action": "Actie toevoegen",
           "edit_action": "Actie bewerken",
           "delete_action": "Actie verwijderen"
+        }
+      },
+      "action_type": {
+        "options": {
+          "press": "Drukken",
+          "turn_on": "Aanzetten",
+          "turn_off": "Uitzetten",
+          "toggle": "Omschakelen"
         }
       }
     }

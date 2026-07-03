@@ -9,6 +9,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_ICON,
     DOMAIN,
     EVENT_TYPE,
     MAX_CUSTOM_EVENTS,
@@ -120,18 +121,8 @@ def _popup_context_for_coordinator(coordinator) -> dict:
             "trigger": {"type": TRIGGER_DELAY, "hours": hours},
         }
         for idx, hours in enumerate(scheduler.time_presets_hours, start=1)
+        if hours is not None
     ]
-    while len(time_presets) < 4:
-        idx = len(time_presets) + 1
-        fallback_hours = 0.5
-        time_presets.append(
-            {
-                "key": f"preset_{idx}",
-                "hours": fallback_hours,
-                "label": _format_time_preset_label(fallback_hours),
-                "trigger": {"type": TRIGGER_DELAY, "hours": fallback_hours},
-            }
-        )
 
     event_presets = []
     if scheduler.home_state_entity:
@@ -154,6 +145,7 @@ def _popup_context_for_coordinator(coordinator) -> dict:
             "key": item.event_name or f"event_{idx}",
             "label": normalize_label(item.label),
             "event_name": item.event_name,
+            "icon": item.icon or "mdi:alarm",
             "trigger": {"type": TRIGGER_EVENT, "event_name": item.event_name},
         }
         for idx, item in enumerate(scheduler.custom_events, start=1)
@@ -198,14 +190,20 @@ def _popup_context_for_coordinator(coordinator) -> dict:
         context[f"preset_{idx}_label"] = item["label"]
         context[f"preset_{idx}_hours"] = item["hours"]
 
+    for idx in range(len(time_presets) + 1, 5):
+        context[f"preset_{idx}_label"] = None
+        context[f"preset_{idx}_hours"] = None
+
     for idx in range(1, MAX_CUSTOM_EVENTS + 1):
         if idx <= len(custom_events):
             item = custom_events[idx - 1]
             context[f"custom_event_{idx}_label"] = item["label"]
             context[f"custom_event_{idx}_name"] = item["event_name"]
+            context[f"custom_event_{idx}_icon"] = item.get("icon") or "mdi:alarm"
         else:
             context[f"custom_event_{idx}_label"] = None
             context[f"custom_event_{idx}_name"] = None
+            context[f"custom_event_{idx}_icon"] = None
 
     return context
 
@@ -240,15 +238,6 @@ async def async_register_services(hass: HomeAssistant) -> None:
             _LOGGER.warning("open_popup: missing action_select_entity for entry_id=%s", entry_id)
             return
 
-        p1_label = popup.get("preset_1_label", "In 30 mins")
-        p1_hours = popup.get("preset_1_hours", 0.5)
-        p2_label = popup.get("preset_2_label", "In 1 hour")
-        p2_hours = popup.get("preset_2_hours", 1)
-        p3_label = popup.get("preset_3_label", "In 2 hours")
-        p3_hours = popup.get("preset_3_hours", 2)
-        p4_label = popup.get("preset_4_label", "In 5 hours")
-        p4_hours = popup.get("preset_4_hours", 5)
-
         def _delay_icon(hours: float) -> str:
             if hours < 1:
                 return "mdi:clock-fast"
@@ -258,10 +247,34 @@ async def async_register_services(hass: HomeAssistant) -> None:
                     return f"mdi:clock-time-{word}-outline"
             return "mdi:clock-outline"
 
-        p1_icon = _delay_icon(float(p1_hours))
-        p2_icon = _delay_icon(float(p2_hours))
-        p3_icon = _delay_icon(float(p3_hours))
-        p4_icon = _delay_icon(float(p4_hours))
+        time_preset_cards = []
+        for idx in range(1, 5):
+            preset_label = popup.get(f"preset_{idx}_label")
+            preset_hours = popup.get(f"preset_{idx}_hours")
+            if preset_label is None or preset_hours is None:
+                continue
+            time_preset_cards.append(
+                {
+                    "type": "button",
+                    "show_name": True,
+                    "show_icon": True,
+                    "show_state": False,
+                    "name": preset_label,
+                    "icon": _delay_icon(float(preset_hours)),
+                    "tap_action": {
+                        "action": "call-service",
+                        "service": "script.scheduled_action_schedule_from_select",
+                        "data": {
+                            "browser_id": browser_id,
+                            "entry_id": entry_id,
+                            "action_select_entity": action_select_entity,
+                            "trigger_type": "delay",
+                            "trigger_hours": preset_hours,
+                            "trigger_label": preset_label,
+                        },
+                    },
+                }
+            )
 
         cards = [
             {
@@ -299,94 +312,17 @@ async def async_register_services(hass: HomeAssistant) -> None:
                     "<strong>Select trigger</strong>"
                 ),
             },
-            {
-                "type": "grid",
-                "square": False,
-                "columns": 4,
-                "cards": [
-                    {
-                        "type": "button",
-                        "show_name": True,
-                        "show_icon": True,
-                        "show_state": False,
-                        "name": p1_label,
-                        "icon": p1_icon,
-                        "tap_action": {
-                            "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
-                            "data": {
-                                "browser_id": browser_id,
-                                "entry_id": entry_id,
-                                "action_select_entity": action_select_entity,
-                                "trigger_type": "delay",
-                                "trigger_hours": p1_hours,
-                                "trigger_label": p1_label,
-                            },
-                        },
-                    },
-                    {
-                        "type": "button",
-                        "show_name": True,
-                        "show_icon": True,
-                        "show_state": False,
-                        "name": p2_label,
-                        "icon": p2_icon,
-                        "tap_action": {
-                            "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
-                            "data": {
-                                "browser_id": browser_id,
-                                "entry_id": entry_id,
-                                "action_select_entity": action_select_entity,
-                                "trigger_type": "delay",
-                                "trigger_hours": p2_hours,
-                                "trigger_label": p2_label,
-                            },
-                        },
-                    },
-                    {
-                        "type": "button",
-                        "show_name": True,
-                        "show_icon": True,
-                        "show_state": False,
-                        "name": p3_label,
-                        "icon": p3_icon,
-                        "tap_action": {
-                            "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
-                            "data": {
-                                "browser_id": browser_id,
-                                "entry_id": entry_id,
-                                "action_select_entity": action_select_entity,
-                                "trigger_type": "delay",
-                                "trigger_hours": p3_hours,
-                                "trigger_label": p3_label,
-                            },
-                        },
-                    },
-                    {
-                        "type": "button",
-                        "show_name": True,
-                        "show_icon": True,
-                        "show_state": False,
-                        "name": p4_label,
-                        "icon": p4_icon,
-                        "tap_action": {
-                            "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
-                            "data": {
-                                "browser_id": browser_id,
-                                "entry_id": entry_id,
-                                "action_select_entity": action_select_entity,
-                                "trigger_type": "delay",
-                                "trigger_hours": p4_hours,
-                                "trigger_label": p4_label,
-                            },
-                        },
-                    },
-                ],
-            },
         ]
+
+        if time_preset_cards:
+            cards.append(
+                {
+                    "type": "grid",
+                    "square": False,
+                    "columns": min(4, len(time_preset_cards)),
+                    "cards": time_preset_cards,
+                }
+            )
 
         state_cards = []
         if popup.get("has_home_trigger"):
@@ -491,6 +427,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
         for idx in range(1, MAX_CUSTOM_EVENTS + 1):
             label = popup.get(f"custom_event_{idx}_label")
             event_name = popup.get(f"custom_event_{idx}_name")
+            icon = popup.get(f"custom_event_{idx}_icon") or "mdi:alarm"
             if label and event_name:
                 custom_event_cards.append(
                     {
@@ -498,7 +435,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "show_name": True,
                         "show_icon": True,
                         "name": label,
-                        "icon": "mdi:alarm",
+                        "icon": icon,
                         "icon_height": "32px",
                         "tap_action": {
                             "action": "call-service",

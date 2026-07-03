@@ -8,6 +8,7 @@ CONF_TIME_PRESETS_HOURS = "time_presets_hours"
 CONF_HOME_STATE_ENTITY = "home_state_entity"
 CONF_SLEEP_STATE_ENTITY = "sleep_state_entity"
 CONF_CUSTOM_EVENTS = "custom_events"
+CONF_ICON = "icon"
 
 ACTION_TYPES = ["turn_on", "turn_off", "toggle", "press"]
 DEFAULT_TIME_PRESETS_HOURS = [0.5, 1, 2, 5]

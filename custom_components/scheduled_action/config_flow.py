@@ -12,6 +12,7 @@ from .const import (
     CONF_ACTIONS,
     CONF_CUSTOM_EVENTS,
     CONF_HOME_STATE_ENTITY,
+    CONF_ICON,
     CONF_NAME,
     CONF_SLEEP_STATE_ENTITY,
     CONF_TIME_PRESETS_HOURS,
@@ -19,14 +20,15 @@ from .const import (
     DOMAIN,
     MAX_CUSTOM_EVENTS,
 )
-from .text_utils import normalize_label, strip_trigger_suffix
+from .text_utils import normalize_label, sort_normalized_label, strip_trigger_suffix
 
-ACTION_TYPE_OPTIONS = {
-    "press": "press",
-    "turn_on": "turn_on",
-    "turn_off": "turn_off",
-    "toggle": "toggle",
+ACTION_TYPE_LABELS = {
+    "press": "Press",
+    "turn_on": "Turn on",
+    "turn_off": "Turn off",
+    "toggle": "Toggle",
 }
+ACTION_TYPE_OPTIONS = ACTION_TYPE_LABELS.copy()
 ACTION_TYPE_ORDER = list(ACTION_TYPE_OPTIONS)
 
 
@@ -39,7 +41,7 @@ def _boolean_entity_selector():
                     {"domain": "input_boolean"},
                     {"domain": "binary_sensor"},
                     {"domain": "switch"},
-                ]
+                ],
             }
         }
     )
@@ -67,6 +69,39 @@ def _action_target_entity_selector():
     )
 
 
+def _icon_selector():
+    return selector({"icon": {}})
+
+
+def _action_type_selector():
+    return selector(
+        {
+            "select": {
+                "mode": "dropdown",
+                "options": [
+                    {"value": key, "label": label}
+                    for key, label in ACTION_TYPE_LABELS.items()
+                ],
+                "translation_key": "action_type",
+            }
+        }
+    )
+
+
+def _preset_field_schema(default: float | None):
+    default_value = "" if default is None else str(default)
+    return vol.Any(None, "", vol.Coerce(float), msg="invalid_number")
+
+
+def _parse_optional_float(value) -> float | None:
+    if value in (None, ""):
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    return float(text)
+
+
 class ScheduledActionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
@@ -83,16 +118,18 @@ class ScheduledActionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is None:
             schema = vol.Schema(
                 {
-                    vol.Optional("preset_1", default=DEFAULT_TIME_PRESETS_HOURS[0]): vol.Coerce(float),
-                    vol.Optional("preset_2", default=DEFAULT_TIME_PRESETS_HOURS[1]): vol.Coerce(float),
-                    vol.Optional("preset_3", default=DEFAULT_TIME_PRESETS_HOURS[2]): vol.Coerce(float),
-                    vol.Optional("preset_4", default=DEFAULT_TIME_PRESETS_HOURS[3]): vol.Coerce(float),
+                    vol.Optional("preset_1", default=str(DEFAULT_TIME_PRESETS_HOURS[0])): str,
+                    vol.Optional("preset_2", default=str(DEFAULT_TIME_PRESETS_HOURS[1])): str,
+                    vol.Optional("preset_3", default=str(DEFAULT_TIME_PRESETS_HOURS[2])): str,
+                    vol.Optional("preset_4", default=str(DEFAULT_TIME_PRESETS_HOURS[3])): str,
                     vol.Optional(CONF_HOME_STATE_ENTITY): _boolean_entity_selector(),
                     vol.Optional(CONF_SLEEP_STATE_ENTITY): _boolean_entity_selector(),
                     vol.Optional("custom_event_1_label", default=""): str,
                     vol.Optional("custom_event_1_name", default=""): str,
+                    vol.Optional("custom_event_1_icon", default="mdi:alarm"): _icon_selector(),
                     vol.Optional("custom_event_2_label", default=""): str,
                     vol.Optional("custom_event_2_name", default=""): str,
+                    vol.Optional("custom_event_2_icon", default="mdi:alarm"): _icon_selector(),
                 }
             )
             return self.async_show_form(step_id="details", data_schema=schema)
@@ -101,18 +138,22 @@ class ScheduledActionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         for idx in (1, 2):
             label = str(user_input.get(f"custom_event_{idx}_label", "")).strip()
             event_name = str(user_input.get(f"custom_event_{idx}_name", "")).strip()
+            icon = str(user_input.get(f"custom_event_{idx}_icon", "")).strip() or "mdi:alarm"
             if label and event_name:
-                custom_events.append({"label": label, "event_name": event_name})
+                custom_events.append(
+                    {"label": label, "event_name": event_name, CONF_ICON: icon}
+                )
+
+        time_presets_hours = []
+        for idx in range(1, 5):
+            value = _parse_optional_float(user_input.get(f"preset_{idx}"))
+            if value is not None:
+                time_presets_hours.append(value)
 
         data = {
             **self._user_input,
             CONF_ACTIONS: [],
-            CONF_TIME_PRESETS_HOURS: [
-                float(user_input["preset_1"]),
-                float(user_input["preset_2"]),
-                float(user_input["preset_3"]),
-                float(user_input["preset_4"]),
-            ],
+            CONF_TIME_PRESETS_HOURS: time_presets_hours,
             CONF_HOME_STATE_ENTITY: user_input.get(CONF_HOME_STATE_ENTITY) or None,
             CONF_SLEEP_STATE_ENTITY: user_input.get(CONF_SLEEP_STATE_ENTITY) or None,
             CONF_CUSTOM_EVENTS: custom_events[:MAX_CUSTOM_EVENTS],
@@ -152,7 +193,7 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                         "action": action,
                     }
                 )
-        return sorted(actions, key=lambda item: item["label"].lower())
+        return sorted(actions, key=lambda item: sort_normalized_label(item["label"]))
 
     def _options_with(self, **updates) -> dict:
         return {
@@ -171,7 +212,7 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                 vol.Required(
                     "action_type",
                     default=(current_action["action"] if current_action else ACTION_TYPE_ORDER[0]),
-                ): vol.In(ACTION_TYPE_OPTIONS),
+                ): _action_type_selector(),
             }
         )
 
@@ -304,7 +345,7 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
                         vol.Required("mode", default=str(user_input.get("mode", "save"))): vol.In({"save": "Save changes", "delete": "Delete action"}),
                         vol.Required("label", default=label): str,
                         vol.Required("target_entity_id", default=target_entity_id): _action_target_entity_selector(),
-                        vol.Required("action_type", default=action_type): vol.In(ACTION_TYPE_OPTIONS),
+                        vol.Required("action_type", default=action_type): _action_type_selector(),
                     }
                 )
             else:
@@ -382,23 +423,51 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
     async def async_step_edit_triggers(self, user_input=None):
         current = self._current()
         current_events = list(current.get(CONF_CUSTOM_EVENTS, []))
-        defaults = current_events + [{"label": "", "event_name": ""}] * (2 - len(current_events))
+        defaults = current_events + [
+            {"label": "", "event_name": "", CONF_ICON: "mdi:alarm"}
+        ] * (2 - len(current_events))
         presets = list(current.get(CONF_TIME_PRESETS_HOURS, DEFAULT_TIME_PRESETS_HOURS))
         while len(presets) < 4:
-            presets.append(DEFAULT_TIME_PRESETS_HOURS[len(presets)])
+            presets.append(None)
         if user_input is None:
             schema = vol.Schema(
                 {
-                    vol.Optional("preset_1", default=float(presets[0])): vol.Coerce(float),
-                    vol.Optional("preset_2", default=float(presets[1])): vol.Coerce(float),
-                    vol.Optional("preset_3", default=float(presets[2])): vol.Coerce(float),
-                    vol.Optional("preset_4", default=float(presets[3])): vol.Coerce(float),
-                    vol.Optional(CONF_HOME_STATE_ENTITY, default=current.get(CONF_HOME_STATE_ENTITY) or None): _boolean_entity_selector(),
-                    vol.Optional(CONF_SLEEP_STATE_ENTITY, default=current.get(CONF_SLEEP_STATE_ENTITY) or None): _boolean_entity_selector(),
+                    vol.Optional(
+                        "preset_1",
+                        default="" if presets[0] is None else str(presets[0]),
+                    ): str,
+                    vol.Optional(
+                        "preset_2",
+                        default="" if presets[1] is None else str(presets[1]),
+                    ): str,
+                    vol.Optional(
+                        "preset_3",
+                        default="" if presets[2] is None else str(presets[2]),
+                    ): str,
+                    vol.Optional(
+                        "preset_4",
+                        default="" if presets[3] is None else str(presets[3]),
+                    ): str,
+                    vol.Optional(
+                        CONF_HOME_STATE_ENTITY,
+                        default=current.get(CONF_HOME_STATE_ENTITY) or None,
+                    ): _boolean_entity_selector(),
+                    vol.Optional(
+                        CONF_SLEEP_STATE_ENTITY,
+                        default=current.get(CONF_SLEEP_STATE_ENTITY) or None,
+                    ): _boolean_entity_selector(),
                     vol.Optional("custom_event_1_label", default=defaults[0]["label"]): str,
                     vol.Optional("custom_event_1_name", default=defaults[0]["event_name"]): str,
+                    vol.Optional(
+                        "custom_event_1_icon",
+                        default=defaults[0].get(CONF_ICON) or "mdi:alarm",
+                    ): _icon_selector(),
                     vol.Optional("custom_event_2_label", default=defaults[1]["label"]): str,
                     vol.Optional("custom_event_2_name", default=defaults[1]["event_name"]): str,
+                    vol.Optional(
+                        "custom_event_2_icon",
+                        default=defaults[1].get(CONF_ICON) or "mdi:alarm",
+                    ): _icon_selector(),
                 }
             )
             return self.async_show_form(step_id="edit_triggers", data_schema=schema)
@@ -407,21 +476,27 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
         for idx in (1, 2):
             label = str(user_input.get(f"custom_event_{idx}_label", "")).strip()
             event_name = str(user_input.get(f"custom_event_{idx}_name", "")).strip()
+            icon = str(user_input.get(f"custom_event_{idx}_icon", "")).strip() or "mdi:alarm"
             if label and event_name:
-                custom_events.append({"label": label, "event_name": event_name})
+                custom_events.append(
+                    {"label": label, "event_name": event_name, CONF_ICON: icon}
+                )
+
+        time_presets_hours = []
+        for idx in range(1, 5):
+            value = _parse_optional_float(user_input.get(f"preset_{idx}"))
+            if value is not None:
+                time_presets_hours.append(value)
 
         return self.async_create_entry(
             title="",
             data=self._options_with(
                 **{
-                    CONF_TIME_PRESETS_HOURS: [
-                        float(user_input["preset_1"]),
-                        float(user_input["preset_2"]),
-                        float(user_input["preset_3"]),
-                        float(user_input["preset_4"]),
-                    ],
-                    CONF_HOME_STATE_ENTITY: user_input.get(CONF_HOME_STATE_ENTITY) or None,
-                    CONF_SLEEP_STATE_ENTITY: user_input.get(CONF_SLEEP_STATE_ENTITY) or None,
+                    CONF_TIME_PRESETS_HOURS: time_presets_hours,
+                    CONF_HOME_STATE_ENTITY: user_input.get(CONF_HOME_STATE_ENTITY)
+                    or None,
+                    CONF_SLEEP_STATE_ENTITY: user_input.get(CONF_SLEEP_STATE_ENTITY)
+                    or None,
                     CONF_CUSTOM_EVENTS: custom_events[:MAX_CUSTOM_EVENTS],
                 }
             ),

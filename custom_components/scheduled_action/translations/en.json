@@ -21,8 +21,10 @@
           "sleep_state_entity": "Sleep state entity",
           "custom_event_1_label": "Custom event 1 label",
           "custom_event_1_name": "Custom event 1 name",
+          "custom_event_1_icon": "Custom event 1 icon",
           "custom_event_2_label": "Custom event 2 label",
-          "custom_event_2_name": "Custom event 2 name"
+          "custom_event_2_name": "Custom event 2 name",
+          "custom_event_2_icon": "Custom event 2 icon"
         }
       }
     }
@@ -94,8 +96,10 @@
           "sleep_state_entity": "Sleep state entity",
           "custom_event_1_label": "Custom event 1 label",
           "custom_event_1_name": "Custom event 1 name",
+          "custom_event_1_icon": "Custom event 1 icon",
           "custom_event_2_label": "Custom event 2 label",
-          "custom_event_2_name": "Custom event 2 name"
+          "custom_event_2_name": "Custom event 2 name",
+          "custom_event_2_icon": "Custom event 2 icon"
         }
       }
     },
@@ -123,6 +127,14 @@
           "add_action": "Add action",
           "edit_action": "Edit action",
           "delete_action": "Delete action"
+        }
+      },
+      "action_type": {
+        "options": {
+          "press": "Press",
+          "turn_on": "Turn on",
+          "turn_off": "Turn off",
+          "toggle": "Toggle"
         }
       }
     }
