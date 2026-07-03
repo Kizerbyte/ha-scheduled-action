@@ -98,7 +98,7 @@ class ScheduledActionCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 due_at = dt_util.parse_datetime(item.due_at)
                 if due_at is not None and due_at <= now:
                     ok = await self._execute_item(item)
-                    changed = True or changed
+                    changed = True
                     if not ok:
                         _LOGGER.warning("Failed to execute scheduled action %s", item.item_id)
                     continue

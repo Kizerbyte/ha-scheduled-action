@@ -28,8 +28,7 @@ ACTION_TYPE_LABELS = {
     "turn_off": "Turn off",
     "toggle": "Toggle",
 }
-ACTION_TYPE_OPTIONS = ACTION_TYPE_LABELS.copy()
-ACTION_TYPE_ORDER = list(ACTION_TYPE_OPTIONS)
+ACTION_TYPE_ORDER = list(ACTION_TYPE_LABELS)
 
 
 def _boolean_entity_selector():
@@ -86,11 +85,6 @@ def _action_type_selector():
             }
         }
     )
-
-
-def _preset_field_schema(default: float | None):
-    default_value = "" if default is None else str(default)
-    return vol.Any(None, "", vol.Coerce(float), msg="invalid_number")
 
 
 def _parse_optional_float(value) -> float | None:
@@ -274,27 +268,6 @@ class ScheduledActionOptionsFlow(config_entries.OptionsFlow):
             self._action_mode = "edit"
             return await self.async_step_select_action_to_edit()
         if action == "remove_action":
-            return await self.async_step_select_action_to_delete()
-        return self.async_abort(reason="unknown_action")
-
-    async def async_step_manage_actions(self, user_input=None):
-        actions = self._current_actions()
-        if user_input is None:
-            choices = ["add_action"]
-            if actions:
-                choices.extend(["edit_action", "delete_action"])
-            schema = vol.Schema({vol.Required("manage_action"): vol.In(choices)})
-            return self.async_show_form(step_id="manage_actions", data_schema=schema)
-
-        choice = str(user_input["manage_action"])
-        if choice == "add_action":
-            self._selected_action_id = None
-            self._action_mode = "add"
-            return await self.async_step_add_action()
-        if choice == "edit_action":
-            self._action_mode = "edit"
-            return await self.async_step_select_action_to_edit()
-        if choice == "delete_action":
             return await self.async_step_select_action_to_delete()
         return self.async_abort(reason="unknown_action")
 

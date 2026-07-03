@@ -66,13 +66,6 @@
           "action": "Action"
         }
       },
-      "manage_actions": {
-        "title": "Manage actions",
-        "description": "Add, edit, or delete predefined actions for this scheduler.",
-        "data": {
-          "manage_action": "Action management"
-        }
-      },
       "select_action_to_edit": {
         "title": "Select action to edit",
         "description": "Choose which action you want to edit.",
@@ -174,13 +167,6 @@
         "options": {
           "custom_triggers": "Custom triggers",
           "standard_triggers": "Standard triggers"
-        }
-      },
-      "manage_action": {
-        "options": {
-          "add_action": "Add action",
-          "edit_action": "Edit action",
-          "delete_action": "Delete action"
         }
       },
       "action_type": {

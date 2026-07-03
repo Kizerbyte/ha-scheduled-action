@@ -66,13 +66,6 @@
           "action": "Actie"
         }
       },
-      "manage_actions": {
-        "title": "Acties beheren",
-        "description": "Voeg vooraf gedefinieerde acties toe, bewerk ze of verwijder ze voor deze planner.",
-        "data": {
-          "manage_action": "Actiebeheer"
-        }
-      },
       "select_action_to_edit": {
         "title": "Kies actie om te bewerken",
         "description": "Kies welke actie je wilt bewerken.",
@@ -174,13 +167,6 @@
         "options": {
           "custom_triggers": "Custom triggers",
           "standard_triggers": "Standaardtriggers"
-        }
-      },
-      "manage_action": {
-        "options": {
-          "add_action": "Actie toevoegen",
-          "edit_action": "Actie bewerken",
-          "delete_action": "Actie verwijderen"
         }
       },
       "action_type": {
