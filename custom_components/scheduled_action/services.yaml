@@ -63,6 +63,7 @@ cancel_all:
         text:
 fire_event:
   name: Fire scheduled action event
+  description: Fire a named event for one scheduled_action entry, or all entries when entry_id is omitted.
   fields:
     event_name:
       required: true

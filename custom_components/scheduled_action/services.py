@@ -700,18 +700,17 @@ async def async_register_services(hass: HomeAssistant) -> None:
         await coordinator.async_request_refresh()
 
     async def _fire_event(call: ServiceCall) -> None:
-        entry_id = str(call.data["entry_id"])
-        _require_coordinator_for_entry(hass, entry_id, SERVICE_FIRE_EVENT)
+        entry_id_raw = call.data.get("entry_id")
+        entry_id = str(entry_id_raw).strip() if entry_id_raw is not None else ""
+        if entry_id:
+            _require_coordinator_for_entry(hass, entry_id, SERVICE_FIRE_EVENT)
         event_name = str(call.data["event_name"]).strip()
         if not event_name:
             raise HomeAssistantError("event_name is required for scheduled_action.fire_event")
-        hass.bus.async_fire(
-            EVENT_TYPE,
-            {
-                "event_name": event_name,
-                "entry_id": entry_id,
-            },
-        )
+        payload = {"event_name": event_name}
+        if entry_id:
+            payload["entry_id"] = entry_id
+        hass.bus.async_fire(EVENT_TYPE, payload)
 
     async def _get_popup_context(call: ServiceCall) -> dict:
         entry_id = str(call.data["entry_id"])
