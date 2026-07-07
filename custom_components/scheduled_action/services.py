@@ -667,10 +667,6 @@ async def async_register_services(hass: HomeAssistant) -> None:
                 merged_label = f"{action_label} {trigger_text}"
             else:
                 merged_label = trigger_text
-        elif action_label and trigger_label:
-            merged_label = f"{action_label} {trigger_label}"
-        elif trigger_label:
-            merged_label = trigger_label
 
         item = QueueItem(
             item_id=uuid.uuid4().hex,
