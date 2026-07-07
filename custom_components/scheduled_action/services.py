@@ -105,6 +105,39 @@ def _text(hass: HomeAssistant, key: str, **values) -> str:
     return template.format(**values)
 
 
+def _build_queue_label(hass: HomeAssistant, action_label: str, trigger_type: str, due_at: str | None = None, trigger_label: str | None = None) -> str:
+    action_label = normalize_label(action_label)
+
+    if trigger_type == TRIGGER_DELAY and due_at:
+        parsed = dt_util.parse_datetime(due_at)
+        if parsed is not None:
+            local_dt = dt_util.as_local(parsed)
+            return _text(hass, "at_time", action=action_label, time=local_dt.strftime("%H:%M"))
+
+    if trigger_type in {TRIGGER_HOME, TRIGGER_AWAY, TRIGGER_ASLEEP, TRIGGER_AWAKE}:
+        trigger_text_map = {
+            TRIGGER_HOME: _text(hass, "when_home").lower(),
+            TRIGGER_AWAY: _text(hass, "when_away").lower(),
+            TRIGGER_ASLEEP: _text(hass, "when_asleep").lower(),
+            TRIGGER_AWAKE: _text(hass, "when_awake").lower(),
+        }
+        trigger_text = trigger_text_map.get(trigger_type, "")
+        if action_label and trigger_text:
+            return f"{action_label} {trigger_text}"
+        if trigger_text:
+            return trigger_text
+
+    if trigger_type == TRIGGER_EVENT:
+        event_label = normalize_trigger_label(trigger_label)
+        if event_label:
+            trigger_text = _text(hass, "on_label", label=event_label)
+            if action_label:
+                return f"{action_label} {trigger_text}"
+            return trigger_text
+
+    return action_label
+
+
 def _coordinator_for_entry(hass: HomeAssistant, entry_id: str):
     return hass.data.get(DOMAIN, {}).get(entry_id)
 
@@ -637,36 +670,15 @@ async def async_register_services(hass: HomeAssistant) -> None:
         if not target_entity_id or not action:
             return
 
-        action_label = normalize_label(
-            call.data.get("label") or (selected_action.label if selected_action is not None else None)
+        action_label = normalize_label(selected_action.label if selected_action is not None else call.data.get("label"))
+        trigger_label = str(call.data.get("trigger_label") or "").strip() if trigger_type == TRIGGER_EVENT else None
+        merged_label = _build_queue_label(
+            hass,
+            action_label,
+            trigger_type,
+            due_at=due_at,
+            trigger_label=trigger_label,
         )
-        trigger_label = str(call.data.get("trigger_label") or "").strip()
-        merged_label = action_label
-
-        if trigger_type == TRIGGER_DELAY and due_at:
-            parsed = dt_util.parse_datetime(due_at)
-            if parsed is not None:
-                local_dt = dt_util.as_local(parsed)
-                time_text = local_dt.strftime("%H:%M")
-                merged_label = _text(hass, "at_time", action=action_label, time=time_text)
-        elif trigger_type in {TRIGGER_HOME, TRIGGER_AWAY, TRIGGER_ASLEEP, TRIGGER_AWAKE}:
-            trigger_text_map = {
-                TRIGGER_HOME: _text(hass, "when_home").lower(),
-                TRIGGER_AWAY: _text(hass, "when_away").lower(),
-                TRIGGER_ASLEEP: _text(hass, "when_asleep").lower(),
-                TRIGGER_AWAKE: _text(hass, "when_awake").lower(),
-            }
-            trigger_text = trigger_text_map.get(trigger_type, "")
-            if action_label and trigger_text:
-                merged_label = f"{action_label} {trigger_text}"
-            elif trigger_text:
-                merged_label = trigger_text
-        elif trigger_type == TRIGGER_EVENT and trigger_label:
-            trigger_text = _text(hass, "on_label", label=normalize_trigger_label(trigger_label))
-            if action_label:
-                merged_label = f"{action_label} {trigger_text}"
-            else:
-                merged_label = trigger_text
 
         item = QueueItem(
             item_id=uuid.uuid4().hex,

@@ -40,6 +40,7 @@ def _describe_queue_item(item) -> str:
 
 def _queue_item_display_dict(item) -> dict:
     return {
+        "item_id": item.item_id,
         "label": str(item.label).strip() if item.label else format_action_key(item.action),
         "target_entity_id": item.target_entity_id,
         "action": format_action_key(item.action),
