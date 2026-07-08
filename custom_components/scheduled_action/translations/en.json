@@ -47,6 +47,7 @@
           "timed_trigger_4": "Timed trigger 4 (hours)",
           "home_state_entity": "Home state entity",
           "sleep_state_entity": "Sleep state entity",
+          "custom_triggers_section": "Custom triggers",
           "custom_trigger_1_label": "Custom trigger 1 label",
           "custom_trigger_1_name": "Custom trigger 1 name",
           "custom_trigger_1_icon": "Custom trigger 1 icon",

@@ -47,6 +47,7 @@
           "timed_trigger_4": "Tijdtrigger 4 (uren)",
           "home_state_entity": "Home-status entiteit",
           "sleep_state_entity": "Slaapstatus entiteit",
+          "custom_triggers_section": "Custom triggers",
           "custom_trigger_1_label": "Label custom trigger 1",
           "custom_trigger_1_name": "Naam custom trigger 1",
           "custom_trigger_1_icon": "Icoon custom trigger 1",
