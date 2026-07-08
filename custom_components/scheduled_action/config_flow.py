@@ -29,7 +29,6 @@ ACTION_TYPE_LABELS = {
     "toggle": "Toggle",
 }
 ACTION_TYPE_ORDER = list(ACTION_TYPE_LABELS)
-CUSTOM_TRIGGERS_SECTION = "custom_triggers_section"
 
 
 def _boolean_entity_selector():
@@ -71,31 +70,6 @@ def _action_target_entity_selector():
 
 def _icon_selector():
     return selector({"icon": {}})
-
-
-def _custom_triggers_section_selector():
-    return selector(
-        {
-            "section": {
-                "collapsed": False,
-                "fields": {
-                    vol.Optional("custom_trigger_1_label", default=""): str,
-                    vol.Optional("custom_trigger_1_name", default=""): str,
-                    vol.Optional("custom_trigger_1_icon", default="mdi:alarm"): _icon_selector(),
-                    vol.Optional("custom_trigger_2_label", default=""): str,
-                    vol.Optional("custom_trigger_2_name", default=""): str,
-                    vol.Optional("custom_trigger_2_icon", default="mdi:alarm"): _icon_selector(),
-                },
-            }
-        }
-    )
-
-
-def _flow_value(user_input: dict, field_name: str):
-    section = user_input.get(CUSTOM_TRIGGERS_SECTION)
-    if isinstance(section, dict) and field_name in section:
-        return section.get(field_name)
-    return user_input.get(field_name)
 
 
 def _action_type_selector():
@@ -173,16 +147,21 @@ class ScheduledActionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Optional("timed_trigger_4", default=str(DEFAULT_TIME_PRESETS_HOURS[3])): str,
                     vol.Optional(CONF_HOME_STATE_ENTITY): _boolean_entity_selector(),
                     vol.Optional(CONF_SLEEP_STATE_ENTITY): _boolean_entity_selector(),
-                    vol.Optional(CUSTOM_TRIGGERS_SECTION): _custom_triggers_section_selector(),
+                    vol.Optional("custom_trigger_1_label", default=""): str,
+                    vol.Optional("custom_trigger_1_name", default=""): str,
+                    vol.Optional("custom_trigger_1_icon", default="mdi:alarm"): _icon_selector(),
+                    vol.Optional("custom_trigger_2_label", default=""): str,
+                    vol.Optional("custom_trigger_2_name", default=""): str,
+                    vol.Optional("custom_trigger_2_icon", default="mdi:alarm"): _icon_selector(),
                 }
             )
             return self.async_show_form(step_id="details", data_schema=schema)
 
         custom_events = []
         for idx in (1, 2):
-            label = str(_flow_value(user_input, f"custom_trigger_{idx}_label") or "").strip()
-            event_name = str(_flow_value(user_input, f"custom_trigger_{idx}_name") or "").strip()
-            icon = str(_flow_value(user_input, f"custom_trigger_{idx}_icon") or "").strip() or "mdi:alarm"
+            label = str(user_input.get(f"custom_trigger_{idx}_label", "")).strip()
+            event_name = str(user_input.get(f"custom_trigger_{idx}_name", "")).strip()
+            icon = str(user_input.get(f"custom_trigger_{idx}_icon", "")).strip() or "mdi:alarm"
             if label and event_name:
                 custom_events.append(
                     {"label": label, "event_name": event_name, CONF_ICON: icon}
