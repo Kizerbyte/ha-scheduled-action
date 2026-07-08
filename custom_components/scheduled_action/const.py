@@ -25,6 +25,7 @@ TRIGGER_AWAKE = "awake"
 
 SERVICE_OPEN_POPUP = "open_popup"
 SERVICE_SCHEDULE = "schedule"
+SERVICE_SCHEDULE_FROM_SELECT = "schedule_from_select"
 SERVICE_CANCEL = "cancel"
 SERVICE_CANCEL_ALL = "cancel_all"
 SERVICE_FIRE_EVENT = "fire_event"

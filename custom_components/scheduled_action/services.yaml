@@ -43,6 +43,42 @@ schedule:
       required: true
       selector:
         object: {}
+schedule_from_select:
+  name: Schedule action from select
+  description: Resolve the selected popup action and schedule it for one scheduled_action entry.
+  fields:
+    entry_id:
+      required: true
+      selector:
+        text:
+    action_select_entity:
+      required: true
+      selector:
+        entity:
+          domain: select
+    trigger_type:
+      required: true
+      selector:
+        text:
+    trigger_hours:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 999
+          step: 0.25
+    trigger_event_name:
+      required: false
+      selector:
+        text:
+    trigger_label:
+      required: false
+      selector:
+        text:
+    browser_id:
+      required: false
+      selector:
+        text:
 cancel:
   name: Cancel scheduled action
   fields:

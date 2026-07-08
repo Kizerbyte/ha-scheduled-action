@@ -20,6 +20,7 @@ from .const import (
     SERVICE_GET_POPUP_CONTEXT,
     SERVICE_OPEN_POPUP,
     SERVICE_SCHEDULE,
+    SERVICE_SCHEDULE_FROM_SELECT,
     TRIGGER_ASLEEP,
     TRIGGER_AWAKE,
     TRIGGER_AWAY,
@@ -366,7 +367,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                     "icon_height": "32px",
                     "tap_action": {
                         "action": "call-service",
-                        "service": "script.scheduled_action_schedule_from_select",
+                        "service": "scheduled_action.schedule_from_select",
                         "data": {
                             "browser_id": browser_id,
                             "entry_id": entry_id,
@@ -440,7 +441,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "icon_height": "32px",
                         "tap_action": {
                             "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
+                            "service": "scheduled_action.schedule_from_select",
                             "data": {
                                 "browser_id": browser_id,
                                 "entry_id": entry_id,
@@ -459,7 +460,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "icon_height": "32px",
                         "tap_action": {
                             "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
+                            "service": "scheduled_action.schedule_from_select",
                             "data": {
                                 "browser_id": browser_id,
                                 "entry_id": entry_id,
@@ -484,7 +485,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "icon_height": "32px",
                         "tap_action": {
                             "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
+                            "service": "scheduled_action.schedule_from_select",
                             "data": {
                                 "browser_id": browser_id,
                                 "entry_id": entry_id,
@@ -503,7 +504,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "icon_height": "32px",
                         "tap_action": {
                             "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
+                            "service": "scheduled_action.schedule_from_select",
                             "data": {
                                 "browser_id": browser_id,
                                 "entry_id": entry_id,
@@ -542,7 +543,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
                         "icon_height": "32px",
                         "tap_action": {
                             "action": "call-service",
-                            "service": "script.scheduled_action_schedule_from_select",
+                            "service": "scheduled_action.schedule_from_select",
                             "data": {
                                 "browser_id": browser_id,
                                 "entry_id": entry_id,
@@ -696,6 +697,64 @@ async def async_register_services(hass: HomeAssistant) -> None:
         await coordinator.store.async_save()
         await coordinator.async_request_refresh()
 
+    async def _schedule_from_select(call: ServiceCall) -> None:
+        entry_id = str(call.data["entry_id"])
+        coordinator = _require_coordinator_for_entry(hass, entry_id, SERVICE_SCHEDULE_FROM_SELECT)
+
+        action_select_entity = str(call.data["action_select_entity"]).strip()
+        if not action_select_entity:
+            raise HomeAssistantError("action_select_entity is required for scheduled_action.schedule_from_select")
+
+        selected_label = str(hass.states.get(action_select_entity).state if hass.states.get(action_select_entity) else "").strip()
+        if not selected_label:
+            raise HomeAssistantError(f"No selected action available from {action_select_entity}")
+
+        selected_action = next((item for item in coordinator.scheduler.actions if normalize_label(item.label) == selected_label), None)
+        if selected_action is None:
+            _LOGGER.warning(
+                "schedule_from_select: could not resolve selected label=%s for entry_id=%s; available_labels=%s",
+                selected_label,
+                entry_id,
+                [normalize_label(item.label) for item in coordinator.scheduler.actions if item.label],
+            )
+            return
+
+        trigger_type = str(call.data.get("trigger_type", TRIGGER_DELAY)).strip() or TRIGGER_DELAY
+        trigger: dict[str, object]
+        if trigger_type == TRIGGER_DELAY:
+            trigger = {"type": TRIGGER_DELAY, "hours": float(call.data.get("trigger_hours", 0.5) or 0.5)}
+        elif trigger_type == TRIGGER_EVENT:
+            trigger = {"type": TRIGGER_EVENT, "event_name": str(call.data.get("trigger_event_name", "")).strip()}
+        elif trigger_type == TRIGGER_HOME:
+            trigger = {"type": TRIGGER_HOME}
+        elif trigger_type == TRIGGER_AWAY:
+            trigger = {"type": TRIGGER_AWAY}
+        elif trigger_type == TRIGGER_ASLEEP:
+            trigger = {"type": TRIGGER_ASLEEP}
+        elif trigger_type == TRIGGER_AWAKE:
+            trigger = {"type": TRIGGER_AWAKE}
+        else:
+            trigger = {"type": TRIGGER_DELAY, "hours": 0.5}
+
+        service_data = {
+            "entry_id": entry_id,
+            "action_id": selected_action.id,
+            "trigger": trigger,
+        }
+        if trigger_type == TRIGGER_EVENT:
+            service_data["trigger_label"] = str(call.data.get("trigger_label") or "").strip()
+
+        await _schedule(ServiceCall(call.hass, call.domain, call.service, service_data))
+
+        browser_id = str(call.data.get("browser_id") or "").strip()
+        if browser_id:
+            await hass.services.async_call(
+                "browser_mod",
+                "close_popup",
+                {"browser_id": browser_id},
+                blocking=True,
+            )
+
     async def _cancel(call: ServiceCall) -> None:
         entry_id = str(call.data["entry_id"])
         item_id = str(call.data["item_id"])
@@ -740,6 +799,7 @@ async def async_register_services(hass: HomeAssistant) -> None:
 
     hass.services.async_register(DOMAIN, SERVICE_OPEN_POPUP, _open_popup)
     hass.services.async_register(DOMAIN, SERVICE_SCHEDULE, _schedule)
+    hass.services.async_register(DOMAIN, SERVICE_SCHEDULE_FROM_SELECT, _schedule_from_select)
     hass.services.async_register(DOMAIN, SERVICE_CANCEL, _cancel)
     hass.services.async_register(DOMAIN, SERVICE_CANCEL_ALL, _cancel_all)
     hass.services.async_register(DOMAIN, SERVICE_FIRE_EVENT, _fire_event)
