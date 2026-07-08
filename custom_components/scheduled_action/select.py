@@ -4,6 +4,7 @@ from homeassistant.components.select import SelectEntity
 
 from .const import DOMAIN
 from .entity_base import ScheduledActionEntity
+from .text_utils import sort_normalized_label
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -18,9 +19,15 @@ class ScheduledActionActionSelect(ScheduledActionEntity, SelectEntity):
         self._attr_icon = "mdi:format-list-bulleted"
         self._attr_current_option = None
 
+    def _sorted_actions(self) -> list:
+        return sorted(
+            [item for item in self.coordinator.scheduler.actions if item.label],
+            key=lambda item: sort_normalized_label(item.label),
+        )
+
     @property
     def options(self) -> list[str]:
-        return [item.label for item in self.coordinator.scheduler.actions if item.label]
+        return [item.label for item in self._sorted_actions()]
 
     @property
     def current_option(self) -> str | None:
@@ -48,7 +55,7 @@ class ScheduledActionActionSelect(ScheduledActionEntity, SelectEntity):
                     "target_entity_id": item.target_entity_id,
                     "action": item.action,
                 }
-                for item in self.coordinator.scheduler.actions
+                for item in self._sorted_actions()
                 if item.id and item.label and item.target_entity_id and item.action
             ],
         }
