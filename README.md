@@ -35,7 +35,7 @@ You can spawn an integration entry that holds its own triggers and actions, so h
 - Popup-based scheduling UI through [Browser Mod](https://github.com/thomasloven/hass-browser_mod)
   - Front-end flexibility, requiring only a fire-dom-event call!
 - Infinitely many different configurations, referenced by 'entry_id'!
-  - Hide unwanted triggers from the popup
+  - Hide unwanted triggers in the popup
 
 ### Note
 - Browser Mod is optional, but recommended if you want the popup flow.
@@ -193,7 +193,7 @@ actions:
 
 Notes:
 - Prefer `scheduled_action.fire_event` over firing the internal event directly.
-- Include `entry_id` if you have more than one scheduler instance.
+- Leave out `entry_id` to have it trigger any integration entry.
 - If no queued item is waiting for that `event_name`, nothing happens; this is a safe no-op.
 
 ![Popup preview](images/custom-event-triggers.png)
@@ -228,7 +228,7 @@ action: <turn_off/turn_on/press/toggle>
 ```
 with
 ```yaml
-action_id: ACTION_ID
+action_id: <ACTION_ID>
 ```
 ### Cancel one queued item
 
