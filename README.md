@@ -23,8 +23,9 @@ Annoyed by an automation that fires **only** on a regular schedule or trigger? L
 
 <q>My airco should turn on an hour before I wake up, but only for this hot night</q>
 
-
 You can spawn an integration entry that holds its own triggers and actions, so have as many as you like.
+
+Here's the Home Assistant [forum page](https://community.home-assistant.io/t/scheduled-action-schedule-any-predefined-action-from-a-popup/1016893)!
 
 ## Features
 - Queue an action for later
